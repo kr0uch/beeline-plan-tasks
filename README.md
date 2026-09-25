@@ -54,13 +54,6 @@ python scripts/04_backtest.py
 uvicorn src.api.app:app --reload
 # http://localhost:8000/map/vostok
 ```
-api
-endpoint	метод	что делает
-/health	get	healthcheck
-/plan	post	первичное планирование
-/plan/{region}	get	сохранённый план
-/replan	post	пересчёт с lock и текущими позициями
-/map/{region}	get	html с картой leaflet
 формат запроса /plan
 ```json
 {
