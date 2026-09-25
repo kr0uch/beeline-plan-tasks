@@ -1,0 +1,2262 @@
+{
+  "routes": [
+    {
+      "engineer_id": "eng_00",
+      "engineer_name": "Соколов",
+      "transport": "car",
+      "distance_km": 26.02,
+      "time_min": 332,
+      "travel_time_min": 37,
+      "service_time_min": 295,
+      "tasks": [
+        {
+          "task_id": 23380,
+          "type_bk": "Подключение",
+          "type_hd": "Конвергенция абонента",
+          "district": "Таганский",
+          "address": "Город Москва, ул.Рогожский Вал, д. 2/50",
+          "lat": 55.7406,
+          "lon": 37.6538,
+          "tw_start": 540,
+          "tw_end": 570,
+          "service_time": 60,
+          "priority": "connection",
+          "required_skills": [
+            "basic",
+            "fmc"
+          ],
+          "required_equipment": []
+        },
+        {
+          "task_id": 74949,
+          "type_bk": "Подключение",
+          "type_hd": "Конвергенция абонента",
+          "district": "Таганский",
+          "address": "Город Москва, ул.Международная, д. 28 стр. 1",
+          "lat": 55.7406,
+          "lon": 37.6538,
+          "tw_start": 540,
+          "tw_end": 570,
+          "service_time": 60,
+          "priority": "connection",
+          "required_skills": [
+            "basic",
+            "fmc"
+          ],
+          "required_equipment": []
+        },
+        {
+          "task_id": 86160,
+          "type_bk": "Подключение",
+          "type_hd": "Конвергенция абонента",
+          "district": "Таганский",
+          "address": "Город Москва, пер.Маяковского, д. 2",
+          "lat": 55.7406,
+          "lon": 37.6538,
+          "tw_start": 540,
+          "tw_end": 660,
+          "service_time": 60,
+          "priority": "connection",
+          "required_skills": [
+            "basic",
+            "fmc"
+          ],
+          "required_equipment": []
+        },
+        {
+          "task_id": 30243,
+          "type_bk": "Локальная заявка",
+          "type_hd": "TVE/ENT. Замена приставки техником",
+          "district": "Таганский",
+          "address": "Город Москва, ул.Нижегородская, д. 25",
+          "lat": 55.7406,
+          "lon": 37.6538,
+          "tw_start": 540,
+          "tw_end": 660,
+          "service_time": 40,
+          "priority": "local",
+          "required_skills": [
+            "basic"
+          ],
+          "required_equipment": [
+            "tv_box"
+          ]
+        },
+        {
+          "task_id": 47670,
+          "type_bk": "Локальная заявка",
+          "type_hd": "Нет линка",
+          "district": "Басманный",
+          "address": "Город Москва, ул.Машкова, д. 13 стр. 1",
+          "lat": 55.7625,
+          "lon": 37.6655,
+          "tw_start": 660,
+          "tw_end": 780,
+          "service_time": 30,
+          "priority": "local",
+          "required_skills": [
+            "basic"
+          ],
+          "required_equipment": []
+        },
+        {
+          "task_id": 98815,
+          "type_bk": "Дозаказ",
+          "type_hd": "Дозаказ оборудования",
+          "district": "Лефортово",
+          "address": "Город Москва, ул.2-я Синичкина, д. 9 к 1",
+          "lat": 55.7575,
+          "lon": 37.6985,
+          "tw_start": 540,
+          "tw_end": 660,
+          "service_time": 45,
+          "priority": "extra",
+          "required_skills": [
+            "basic",
+            "fmc"
+          ],
+          "required_equipment": []
+        }
+      ]
+    },
+    {
+      "engineer_id": "eng_01",
+      "engineer_name": "Мельников",
+      "transport": "car",
+      "distance_km": 18.63,
+      "time_min": 306,
+      "travel_time_min": 26,
+      "service_time_min": 280,
+      "tasks": [
+        {
+          "task_id": 41077,
+          "type_bk": "Подключение",
+          "type_hd": "Конвергенция абонента",
+          "district": "Таганский",
+          "address": "Город Москва, ул.Новорогожская, д. 8",
+          "lat": 55.7406,
+          "lon": 37.6538,
+          "tw_start": 540,
+          "tw_end": 570,
+          "service_time": 60,
+          "priority": "connection",
+          "required_skills": [
+            "basic",
+            "fmc"
+          ],
+          "required_equipment": []
+        },
+        {
+          "task_id": 37272,
+          "type_bk": "Подключение",
+          "type_hd": "Конвергенция абонента",
+          "district": "Таганский",
+          "address": "Город Москва, ул.Талалихина, д. 2/1 к 4",
+          "lat": 55.7406,
+          "lon": 37.6538,
+          "tw_start": 540,
+          "tw_end": 570,
+          "service_time": 60,
+          "priority": "connection",
+          "required_skills": [
+            "basic",
+            "fmc"
+          ],
+          "required_equipment": []
+        },
+        {
+          "task_id": 76643,
+          "type_bk": "Локальная заявка",
+          "type_hd": "Нет линка",
+          "district": "Таганский",
+          "address": "Город Москва, ул.Большая Калитниковская, д. 38",
+          "lat": 55.7406,
+          "lon": 37.6538,
+          "tw_start": 540,
+          "tw_end": 660,
+          "service_time": 30,
+          "priority": "local",
+          "required_skills": [
+            "basic"
+          ],
+          "required_equipment": []
+        },
+        {
+          "task_id": 17349,
+          "type_bk": "Глобальная проблема",
+          "type_hd": "Информация",
+          "district": "Таганский",
+          "address": "г.Город Москва, ул.Новорогожская, д. 20",
+          "lat": 55.7406,
+          "lon": 37.6538,
+          "tw_start": 540,
+          "tw_end": 570,
+          "service_time": 40,
+          "priority": "local",
+          "required_skills": [
+            "basic"
+          ],
+          "required_equipment": []
+        },
+        {
+          "task_id": 24076,
+          "type_bk": "Локальная заявка",
+          "type_hd": "Роутер. Замена техническим специалистом",
+          "district": "Таганский",
+          "address": "Город Москва, ул.Новорогожская, д. 10",
+          "lat": 55.7406,
+          "lon": 37.6538,
+          "tw_start": 540,
+          "tw_end": 570,
+          "service_time": 45,
+          "priority": "local",
+          "required_skills": [
+            "basic"
+          ],
+          "required_equipment": [
+            "router"
+          ]
+        },
+        {
+          "task_id": 22634,
+          "type_bk": "Дозаказ",
+          "type_hd": "Дозаказ оборудования",
+          "district": "Таганский",
+          "address": "Город Москва, ул.Стройковская, д. 8",
+          "lat": 55.7406,
+          "lon": 37.6538,
+          "tw_start": 540,
+          "tw_end": 570,
+          "service_time": 45,
+          "priority": "extra",
+          "required_skills": [
+            "basic",
+            "fmc"
+          ],
+          "required_equipment": []
+        }
+      ]
+    },
+    {
+      "engineer_id": "eng_02",
+      "engineer_name": "Матвеев",
+      "transport": "car",
+      "distance_km": 20.7,
+      "time_min": 316,
+      "travel_time_min": 36,
+      "service_time_min": 280,
+      "tasks": [
+        {
+          "task_id": 71388,
+          "type_bk": "Подключение",
+          "type_hd": "Конвергенция абонента",
+          "district": "Текстильщики",
+          "address": "Город Москва, ул.Артюхиной, д. 20А",
+          "lat": 55.7087,
+          "lon": 37.7445,
+          "tw_start": 540,
+          "tw_end": 570,
+          "service_time": 60,
+          "priority": "connection",
+          "required_skills": [
+            "basic",
+            "fmc"
+          ],
+          "required_equipment": []
+        },
+        {
+          "task_id": 34366,
+          "type_bk": "Подключение",
+          "type_hd": "Конвергенция абонента",
+          "district": "Текстильщики",
+          "address": "Город Москва, ул.Малышева, д. 13",
+          "lat": 55.7087,
+          "lon": 37.7445,
+          "tw_start": 540,
+          "tw_end": 570,
+          "service_time": 60,
+          "priority": "connection",
+          "required_skills": [
+            "basic",
+            "fmc"
+          ],
+          "required_equipment": []
+        },
+        {
+          "task_id": 30769,
+          "type_bk": "Подключение",
+          "type_hd": "Конвергенция абонента",
+          "district": "Текстильщики",
+          "address": "Город Москва, ул.Саратовская, д. 14/1",
+          "lat": 55.7087,
+          "lon": 37.7445,
+          "tw_start": 540,
+          "tw_end": 570,
+          "service_time": 60,
+          "priority": "connection",
+          "required_skills": [
+            "basic",
+            "fmc"
+          ],
+          "required_equipment": []
+        },
+        {
+          "task_id": 60720,
+          "type_bk": "Локальная заявка",
+          "type_hd": "Нет линка",
+          "district": "Текстильщики",
+          "address": "Город Москва, б-р.Волжский, д. 50 к 2",
+          "lat": 55.7087,
+          "lon": 37.7445,
+          "tw_start": 540,
+          "tw_end": 570,
+          "service_time": 30,
+          "priority": "local",
+          "required_skills": [
+            "basic"
+          ],
+          "required_equipment": []
+        },
+        {
+          "task_id": 48174,
+          "type_bk": "Локальная заявка",
+          "type_hd": "Мониторинг",
+          "district": "Кузьминки",
+          "address": "Город Москва, ул.Маршала Чуйкова, д. 9 к 2",
+          "lat": 55.6945,
+          "lon": 37.7735,
+          "tw_start": 540,
+          "tw_end": 660,
+          "service_time": 25,
+          "priority": "local",
+          "required_skills": [
+            "basic"
+          ],
+          "required_equipment": []
+        },
+        {
+          "task_id": 92031,
+          "type_bk": "Дозаказ",
+          "type_hd": "Дозаказ оборудования",
+          "district": "Выхино",
+          "address": "Город Москва, ул.Ферганская, д. 28/7",
+          "lat": 55.7235,
+          "lon": 37.8275,
+          "tw_start": 540,
+          "tw_end": 660,
+          "service_time": 45,
+          "priority": "extra",
+          "required_skills": [
+            "basic",
+            "fmc"
+          ],
+          "required_equipment": []
+        }
+      ]
+    },
+    {
+      "engineer_id": "eng_03",
+      "engineer_name": "Попов",
+      "transport": "car",
+      "distance_km": 24.8,
+      "time_min": 364,
+      "travel_time_min": 34,
+      "service_time_min": 330,
+      "tasks": [
+        {
+          "task_id": 82388,
+          "type_bk": "Подключение",
+          "type_hd": "Конвергенция абонента",
+          "district": "Южнопортовый",
+          "address": "Город Москва, ул.1-я Дубровская, д. 6",
+          "lat": 55.7235,
+          "lon": 37.6875,
+          "tw_start": 540,
+          "tw_end": 570,
+          "service_time": 60,
+          "priority": "connection",
+          "required_skills": [
+            "basic",
+            "fmc"
+          ],
+          "required_equipment": []
+        },
+        {
+          "task_id": 35675,
+          "type_bk": "Подключение",
+          "type_hd": "Конвергенция абонента",
+          "district": "Южнопортовый",
+          "address": "Город Москва, ул.Трофимова, д. 24 к 2",
+          "lat": 55.7235,
+          "lon": 37.6875,
+          "tw_start": 540,
+          "tw_end": 570,
+          "service_time": 60,
+          "priority": "connection",
+          "required_skills": [
+            "basic",
+            "fmc"
+          ],
+          "required_equipment": []
+        },
+        {
+          "task_id": 94409,
+          "type_bk": "Подключение",
+          "type_hd": "Конвергенция абонента",
+          "district": "Лефортово",
+          "address": "Город Москва, ул.Авиамоторная, д. 14",
+          "lat": 55.7575,
+          "lon": 37.6985,
+          "tw_start": 540,
+          "tw_end": 570,
+          "service_time": 60,
+          "priority": "connection",
+          "required_skills": [
+            "basic",
+            "fmc"
+          ],
+          "required_equipment": []
+        },
+        {
+          "task_id": 47330,
+          "type_bk": "Локальная заявка",
+          "type_hd": "Роутер. Замена техническим специалистом",
+          "district": "Лефортово",
+          "address": "Город Москва, ул.Красноказарменная, д. 9Б стр. 1",
+          "lat": 55.7575,
+          "lon": 37.6985,
+          "tw_start": 540,
+          "tw_end": 570,
+          "service_time": 45,
+          "priority": "local",
+          "required_skills": [
+            "basic"
+          ],
+          "required_equipment": [
+            "router"
+          ]
+        },
+        {
+          "task_id": 69967,
+          "type_bk": "Дозаказ",
+          "type_hd": "Заказ подключения/Дозаказ оборудования",
+          "district": "Лефортово",
+          "address": "Город Москва, ул.Боровая, д. 14",
+          "lat": 55.7575,
+          "lon": 37.6985,
+          "tw_start": 540,
+          "tw_end": 570,
+          "service_time": 105,
+          "priority": "extra",
+          "required_skills": [
+            "basic",
+            "fttb",
+            "gigabit"
+          ],
+          "required_equipment": [
+            "gigabit_kit"
+          ]
+        }
+      ]
+    },
+    {
+      "engineer_id": "eng_04",
+      "engineer_name": "Арташкин",
+      "transport": "car",
+      "distance_km": 3.54,
+      "time_min": 300,
+      "travel_time_min": 10,
+      "service_time_min": 290,
+      "tasks": [
+        {
+          "task_id": 77563,
+          "type_bk": "Подключение",
+          "type_hd": "Конвергенция абонента",
+          "district": "Кузьминки",
+          "address": "Город Москва, ул.Зеленодольская, д. 28Б",
+          "lat": 55.6945,
+          "lon": 37.7735,
+          "tw_start": 540,
+          "tw_end": 570,
+          "service_time": 60,
+          "priority": "connection",
+          "required_skills": [
+            "basic",
+            "fmc"
+          ],
+          "required_equipment": []
+        },
+        {
+          "task_id": 61540,
+          "type_bk": "Подключение",
+          "type_hd": "Конвергенция абонента",
+          "district": "Кузьминки",
+          "address": "Город Москва, ул.Юных Ленинцев, д. 84",
+          "lat": 55.6945,
+          "lon": 37.7735,
+          "tw_start": 540,
+          "tw_end": 570,
+          "service_time": 60,
+          "priority": "connection",
+          "required_skills": [
+            "basic",
+            "fmc"
+          ],
+          "required_equipment": []
+        },
+        {
+          "task_id": 10245,
+          "type_bk": "Подключение",
+          "type_hd": "Конвергенция абонента",
+          "district": "Кузьминки",
+          "address": "Город Москва, ул.Фёдора Полетаева, д. 2 к 6",
+          "lat": 55.6945,
+          "lon": 37.7735,
+          "tw_start": 540,
+          "tw_end": 570,
+          "service_time": 60,
+          "priority": "connection",
+          "required_skills": [
+            "basic",
+            "fmc"
+          ],
+          "required_equipment": []
+        },
+        {
+          "task_id": 32807,
+          "type_bk": "Локальная заявка",
+          "type_hd": "Работа с кабелем",
+          "district": "Кузьминки",
+          "address": "Город Москва, ул.Окская, д. 6 к 1",
+          "lat": 55.6945,
+          "lon": 37.7735,
+          "tw_start": 540,
+          "tw_end": 570,
+          "service_time": 50,
+          "priority": "local",
+          "required_skills": [
+            "basic"
+          ],
+          "required_equipment": [
+            "cable_kit"
+          ]
+        },
+        {
+          "task_id": 84627,
+          "type_bk": "Подключение",
+          "type_hd": "Конвергенция абонента",
+          "district": "Кузьминки",
+          "address": "Город Москва, ул.Окская, д. 32",
+          "lat": 55.6945,
+          "lon": 37.7735,
+          "tw_start": 660,
+          "tw_end": 780,
+          "service_time": 60,
+          "priority": "connection",
+          "required_skills": [
+            "basic",
+            "fmc"
+          ],
+          "required_equipment": []
+        }
+      ]
+    },
+    {
+      "engineer_id": "eng_05",
+      "engineer_name": "Комарь",
+      "transport": "car",
+      "distance_km": 11.59,
+      "time_min": 291,
+      "travel_time_min": 21,
+      "service_time_min": 270,
+      "tasks": [
+        {
+          "task_id": 57866,
+          "type_bk": "Подключение",
+          "type_hd": "Конвергенция абонента",
+          "district": "Рязанский",
+          "address": "Город Москва, ул.Окская, д. 48/2",
+          "lat": 55.7225,
+          "lon": 37.7625,
+          "tw_start": 540,
+          "tw_end": 570,
+          "service_time": 60,
+          "priority": "connection",
+          "required_skills": [
+            "basic",
+            "fmc"
+          ],
+          "required_equipment": []
+        },
+        {
+          "task_id": 52405,
+          "type_bk": "Подключение",
+          "type_hd": "Конвергенция абонента",
+          "district": "Рязанский",
+          "address": "Город Москва, ул.Зарайская, д. 51 к 2",
+          "lat": 55.7225,
+          "lon": 37.7625,
+          "tw_start": 540,
+          "tw_end": 570,
+          "service_time": 60,
+          "priority": "connection",
+          "required_skills": [
+            "basic",
+            "fmc"
+          ],
+          "required_equipment": []
+        },
+        {
+          "task_id": 10135,
+          "type_bk": "Подключение",
+          "type_hd": "Конвергенция абонента",
+          "district": "Рязанский",
+          "address": "Город Москва, ул.3-я Институтская, д. 5 к 2",
+          "lat": 55.7225,
+          "lon": 37.7625,
+          "tw_start": 540,
+          "tw_end": 660,
+          "service_time": 60,
+          "priority": "connection",
+          "required_skills": [
+            "basic",
+            "fmc"
+          ],
+          "required_equipment": []
+        },
+        {
+          "task_id": 51115,
+          "type_bk": "Локальная заявка",
+          "type_hd": "Нет линка",
+          "district": "Рязанский",
+          "address": "Город Москва, ул.Паперника, д. 18",
+          "lat": 55.7225,
+          "lon": 37.7625,
+          "tw_start": 540,
+          "tw_end": 660,
+          "service_time": 30,
+          "priority": "local",
+          "required_skills": [
+            "basic"
+          ],
+          "required_equipment": []
+        },
+        {
+          "task_id": 46393,
+          "type_bk": "Подключение",
+          "type_hd": "Конвергенция абонента",
+          "district": "Рязанский",
+          "address": "Город Москва, ул.Михайлова, д. 14",
+          "lat": 55.7225,
+          "lon": 37.7625,
+          "tw_start": 660,
+          "tw_end": 780,
+          "service_time": 60,
+          "priority": "connection",
+          "required_skills": [
+            "basic",
+            "fmc"
+          ],
+          "required_equipment": []
+        }
+      ]
+    },
+    {
+      "engineer_id": "eng_06",
+      "engineer_name": "Каушнян",
+      "transport": "car",
+      "distance_km": 7.16,
+      "time_min": 305,
+      "travel_time_min": 15,
+      "service_time_min": 290,
+      "tasks": [
+        {
+          "task_id": 53587,
+          "type_bk": "Подключение",
+          "type_hd": "Конвергенция абонента",
+          "district": "Текстильщики",
+          "address": "Город Москва, ул.Артюхиной, д. 16",
+          "lat": 55.7087,
+          "lon": 37.7445,
+          "tw_start": 540,
+          "tw_end": 570,
+          "service_time": 60,
+          "priority": "connection",
+          "required_skills": [
+            "basic",
+            "fmc"
+          ],
+          "required_equipment": []
+        },
+        {
+          "task_id": 87693,
+          "type_bk": "Подключение",
+          "type_hd": "Конвергенция абонента",
+          "district": "Текстильщики",
+          "address": "Город Москва, ул.Чистова, д. 12",
+          "lat": 55.7087,
+          "lon": 37.7445,
+          "tw_start": 540,
+          "tw_end": 570,
+          "service_time": 60,
+          "priority": "connection",
+          "required_skills": [
+            "basic",
+            "fmc"
+          ],
+          "required_equipment": []
+        },
+        {
+          "task_id": 50104,
+          "type_bk": "Подключение",
+          "type_hd": "Заявка на подключение",
+          "district": "Текстильщики",
+          "address": "Город Москва, ул.Грайвороновская, д. 10 к 2",
+          "lat": 55.7087,
+          "lon": 37.7445,
+          "tw_start": 540,
+          "tw_end": 660,
+          "service_time": 80,
+          "priority": "connection",
+          "required_skills": [
+            "basic",
+            "gigabit"
+          ],
+          "required_equipment": [
+            "gigabit_kit"
+          ]
+        },
+        {
+          "task_id": 73572,
+          "type_bk": "Локальная заявка",
+          "type_hd": "Нет линка",
+          "district": "Кузьминки",
+          "address": "Город Москва, пр-кт.Волгоградский, д. 97 к 1",
+          "lat": 55.6945,
+          "lon": 37.7735,
+          "tw_start": 540,
+          "tw_end": 570,
+          "service_time": 30,
+          "priority": "local",
+          "required_skills": [
+            "basic"
+          ],
+          "required_equipment": []
+        },
+        {
+          "task_id": 74198,
+          "type_bk": "Подключение",
+          "type_hd": "Конвергенция абонента",
+          "district": "Кузьминки",
+          "address": "Город Москва, пр-кт.Волгоградский, д. 128 к 5",
+          "lat": 55.6945,
+          "lon": 37.7735,
+          "tw_start": 660,
+          "tw_end": 780,
+          "service_time": 60,
+          "priority": "connection",
+          "required_skills": [
+            "basic",
+            "fmc"
+          ],
+          "required_equipment": []
+        }
+      ]
+    },
+    {
+      "engineer_id": "eng_07",
+      "engineer_name": "Зверев",
+      "transport": "car",
+      "distance_km": 13.1,
+      "time_min": 344,
+      "travel_time_min": 24,
+      "service_time_min": 320,
+      "tasks": [
+        {
+          "task_id": 93086,
+          "type_bk": "Подключение",
+          "type_hd": "Конвергенция абонента",
+          "district": "Рязанский",
+          "address": "Город Москва, ул.Паперника, д. 19",
+          "lat": 55.7225,
+          "lon": 37.7625,
+          "tw_start": 540,
+          "tw_end": 570,
+          "service_time": 60,
+          "priority": "connection",
+          "required_skills": [
+            "basic",
+            "fmc"
+          ],
+          "required_equipment": []
+        },
+        {
+          "task_id": 7939,
+          "type_bk": "Подключение",
+          "type_hd": "Конвергенция абонента",
+          "district": "Рязанский",
+          "address": "Город Москва, пр-кт.Рязанский, д. 73",
+          "lat": 55.7225,
+          "lon": 37.7625,
+          "tw_start": 540,
+          "tw_end": 570,
+          "service_time": 60,
+          "priority": "connection",
+          "required_skills": [
+            "basic",
+            "fmc"
+          ],
+          "required_equipment": []
+        },
+        {
+          "task_id": 18754,
+          "type_bk": "Подключение",
+          "type_hd": "Конвергенция абонента",
+          "district": "Рязанский",
+          "address": "Город Москва, ул.1-я Новокузьминская, д. 16 к 1",
+          "lat": 55.7225,
+          "lon": 37.7625,
+          "tw_start": 540,
+          "tw_end": 660,
+          "service_time": 60,
+          "priority": "connection",
+          "required_skills": [
+            "basic",
+            "fmc"
+          ],
+          "required_equipment": []
+        },
+        {
+          "task_id": 48238,
+          "type_bk": "Локальная заявка",
+          "type_hd": "Разрывы",
+          "district": "Текстильщики",
+          "address": "Город Москва, ул.Артюхиной, д. 3",
+          "lat": 55.7087,
+          "lon": 37.7445,
+          "tw_start": 540,
+          "tw_end": 570,
+          "service_time": 40,
+          "priority": "local",
+          "required_skills": [
+            "basic"
+          ],
+          "required_equipment": [
+            "cable_kit"
+          ]
+        },
+        {
+          "task_id": 21367,
+          "type_bk": "Глобальная проблема",
+          "type_hd": "Авария",
+          "district": "Текстильщики",
+          "address": "г.Город Москва, ул.Саратовская, д. 16",
+          "lat": 55.7087,
+          "lon": 37.7445,
+          "tw_start": 660,
+          "tw_end": 780,
+          "service_time": 100,
+          "priority": "emergency",
+          "required_skills": [
+            "basic",
+            "emergency"
+          ],
+          "required_equipment": []
+        }
+      ]
+    },
+    {
+      "engineer_id": "eng_08",
+      "engineer_name": "Перов",
+      "transport": "car",
+      "distance_km": 23.91,
+      "time_min": 338,
+      "travel_time_min": 38,
+      "service_time_min": 300,
+      "tasks": [
+        {
+          "task_id": 29890,
+          "type_bk": "Подключение",
+          "type_hd": "Конвергенция абонента",
+          "district": "Нижегородский",
+          "address": "Город Москва, ул.Нижегородская, д. 61",
+          "lat": 55.7295,
+          "lon": 37.7205,
+          "tw_start": 540,
+          "tw_end": 570,
+          "service_time": 60,
+          "priority": "connection",
+          "required_skills": [
+            "basic",
+            "fmc"
+          ],
+          "required_equipment": []
+        },
+        {
+          "task_id": 82808,
+          "type_bk": "Подключение",
+          "type_hd": "Конвергенция абонента",
+          "district": "Нижегородский",
+          "address": "Город Москва, ул.3-я Карачаровская, д. 4 к 1",
+          "lat": 55.7295,
+          "lon": 37.7205,
+          "tw_start": 540,
+          "tw_end": 570,
+          "service_time": 60,
+          "priority": "connection",
+          "required_skills": [
+            "basic",
+            "fmc"
+          ],
+          "required_equipment": []
+        },
+        {
+          "task_id": 76082,
+          "type_bk": "Подключение",
+          "type_hd": "Заказ подключения/Дозаказ оборудования",
+          "district": "Нижегородский",
+          "address": "Город Москва, ул.Смирновская, д. 6",
+          "lat": 55.7295,
+          "lon": 37.7205,
+          "tw_start": 540,
+          "tw_end": 570,
+          "service_time": 90,
+          "priority": "connection",
+          "required_skills": [
+            "basic",
+            "fttb"
+          ],
+          "required_equipment": []
+        },
+        {
+          "task_id": 33527,
+          "type_bk": "Дозаказ",
+          "type_hd": "Дозаказ оборудования",
+          "district": "Нижегородский",
+          "address": "Москва, проезд Орехово-Зуевский, д. 18/8",
+          "lat": 55.7295,
+          "lon": 37.7205,
+          "tw_start": 540,
+          "tw_end": 570,
+          "service_time": 45,
+          "priority": "extra",
+          "required_skills": [
+            "basic",
+            "fmc"
+          ],
+          "required_equipment": []
+        },
+        {
+          "task_id": 31260,
+          "type_bk": "Дозаказ",
+          "type_hd": "Дозаказ оборудования",
+          "district": "Выхино",
+          "address": "Город Москва, б-р.Самаркандский Квартал 137а, д. к5",
+          "lat": 55.7235,
+          "lon": 37.8275,
+          "tw_start": 660,
+          "tw_end": 780,
+          "service_time": 45,
+          "priority": "extra",
+          "required_skills": [
+            "basic",
+            "fmc"
+          ],
+          "required_equipment": []
+        }
+      ]
+    },
+    {
+      "engineer_id": "eng_09",
+      "engineer_name": "Белузин",
+      "transport": "car",
+      "distance_km": 23.91,
+      "time_min": 318,
+      "travel_time_min": 38,
+      "service_time_min": 280,
+      "tasks": [
+        {
+          "task_id": 67554,
+          "type_bk": "Подключение",
+          "type_hd": "Заявка на подключение",
+          "district": "Нижегородский",
+          "address": "Город Москва, ул.Бронницкая, д. 12",
+          "lat": 55.7295,
+          "lon": 37.7205,
+          "tw_start": 540,
+          "tw_end": 570,
+          "service_time": 50,
+          "priority": "connection",
+          "required_skills": [
+            "basic"
+          ],
+          "required_equipment": []
+        },
+        {
+          "task_id": 50219,
+          "type_bk": "Локальная заявка",
+          "type_hd": "Нет линка",
+          "district": "Нижегородский",
+          "address": "Город Москва, ул.Чистопольская, д. 2 к 2",
+          "lat": 55.7295,
+          "lon": 37.7205,
+          "tw_start": 540,
+          "tw_end": 570,
+          "service_time": 30,
+          "priority": "local",
+          "required_skills": [
+            "basic"
+          ],
+          "required_equipment": []
+        },
+        {
+          "task_id": 41912,
+          "type_bk": "Локальная заявка",
+          "type_hd": "Нет линка",
+          "district": "Выхино",
+          "address": "Город Москва, проезд.Ферганский, д. 7 к 5",
+          "lat": 55.7235,
+          "lon": 37.8275,
+          "tw_start": 540,
+          "tw_end": 570,
+          "service_time": 30,
+          "priority": "local",
+          "required_skills": [
+            "basic"
+          ],
+          "required_equipment": []
+        },
+        {
+          "task_id": 54964,
+          "type_bk": "Глобальная проблема",
+          "type_hd": "Информация",
+          "district": "Выхино",
+          "address": "г.Город Москва, ул.Ташкентская, д. 16к2",
+          "lat": 55.7235,
+          "lon": 37.8275,
+          "tw_start": 540,
+          "tw_end": 570,
+          "service_time": 40,
+          "priority": "local",
+          "required_skills": [
+            "basic"
+          ],
+          "required_equipment": []
+        },
+        {
+          "task_id": 41962,
+          "type_bk": "Глобальная проблема",
+          "type_hd": "Информация",
+          "district": "Выхино",
+          "address": "г.Город Москва, б-р.Самаркандский, д. 32к1",
+          "lat": 55.7235,
+          "lon": 37.8275,
+          "tw_start": 540,
+          "tw_end": 570,
+          "service_time": 40,
+          "priority": "local",
+          "required_skills": [
+            "basic"
+          ],
+          "required_equipment": []
+        },
+        {
+          "task_id": 97886,
+          "type_bk": "Глобальная проблема",
+          "type_hd": "Информация",
+          "district": "Выхино",
+          "address": "г.Город Москва, б-р.Самаркандский, д. 10к2",
+          "lat": 55.7235,
+          "lon": 37.8275,
+          "tw_start": 540,
+          "tw_end": 570,
+          "service_time": 40,
+          "priority": "local",
+          "required_skills": [
+            "basic"
+          ],
+          "required_equipment": []
+        },
+        {
+          "task_id": 43506,
+          "type_bk": "Локальная заявка",
+          "type_hd": "Переключение на Гбит/с",
+          "district": "Выхино",
+          "address": "Город Москва, б-р.Самаркандский Квартал 137а, д. к5",
+          "lat": 55.7235,
+          "lon": 37.8275,
+          "tw_start": 660,
+          "tw_end": 780,
+          "service_time": 50,
+          "priority": "local",
+          "required_skills": [
+            "basic"
+          ],
+          "required_equipment": []
+        }
+      ]
+    },
+    {
+      "engineer_id": "eng_10",
+      "engineer_name": "Гусаковский",
+      "transport": "car",
+      "distance_km": 25.56,
+      "time_min": 296,
+      "travel_time_min": 36,
+      "service_time_min": 260,
+      "tasks": [
+        {
+          "task_id": 24980,
+          "type_bk": "Глобальная проблема",
+          "type_hd": "Авария",
+          "district": "Басманный",
+          "address": "г.Город Москва, наб.Семеновская, д. 3/1к2",
+          "lat": 55.7625,
+          "lon": 37.6655,
+          "tw_start": 540,
+          "tw_end": 570,
+          "service_time": 100,
+          "priority": "emergency",
+          "required_skills": [
+            "basic",
+            "emergency"
+          ],
+          "required_equipment": []
+        },
+        {
+          "task_id": 4893,
+          "type_bk": "Локальная заявка",
+          "type_hd": "Нет линка",
+          "district": "Басманный",
+          "address": "Город Москва, ул.Земляной Вал, д. 24/30 стр. 1",
+          "lat": 55.7625,
+          "lon": 37.6655,
+          "tw_start": 540,
+          "tw_end": 570,
+          "service_time": 30,
+          "priority": "local",
+          "required_skills": [
+            "basic"
+          ],
+          "required_equipment": []
+        },
+        {
+          "task_id": 15648,
+          "type_bk": "Глобальная проблема",
+          "type_hd": "Информация",
+          "district": "Басманный",
+          "address": "г.Город Москва, наб.Семеновская, д. 2/1",
+          "lat": 55.7625,
+          "lon": 37.6655,
+          "tw_start": 540,
+          "tw_end": 570,
+          "service_time": 40,
+          "priority": "local",
+          "required_skills": [
+            "basic"
+          ],
+          "required_equipment": []
+        },
+        {
+          "task_id": 26645,
+          "type_bk": "Локальная заявка",
+          "type_hd": "TVE/ENT. Другие ошибки",
+          "district": "Лефортово",
+          "address": "Город Москва, ул.Сторожевая, д. 31",
+          "lat": 55.7575,
+          "lon": 37.6985,
+          "tw_start": 540,
+          "tw_end": 570,
+          "service_time": 40,
+          "priority": "local",
+          "required_skills": [
+            "basic"
+          ],
+          "required_equipment": [
+            "tv_box"
+          ]
+        },
+        {
+          "task_id": 76678,
+          "type_bk": "Локальная заявка",
+          "type_hd": "Работа с кабелем",
+          "district": "Лефортово",
+          "address": "Город Москва, ул.Боровая, д. 12",
+          "lat": 55.7575,
+          "lon": 37.6985,
+          "tw_start": 540,
+          "tw_end": 570,
+          "service_time": 50,
+          "priority": "local",
+          "required_skills": [
+            "basic"
+          ],
+          "required_equipment": [
+            "cable_kit"
+          ]
+        }
+      ]
+    },
+    {
+      "engineer_id": "eng_11",
+      "engineer_name": "Свеженцев",
+      "transport": "car",
+      "distance_km": 25.44,
+      "time_min": 343,
+      "travel_time_min": 43,
+      "service_time_min": 300,
+      "tasks": [
+        {
+          "task_id": 98182,
+          "type_bk": "Подключение",
+          "type_hd": "Заявка на подключение",
+          "district": "Нижегородский",
+          "address": "Город Москва, ул.Нижегородская, д. 63",
+          "lat": 55.7295,
+          "lon": 37.7205,
+          "tw_start": 540,
+          "tw_end": 570,
+          "service_time": 50,
+          "priority": "connection",
+          "required_skills": [
+            "basic"
+          ],
+          "required_equipment": []
+        },
+        {
+          "task_id": 68476,
+          "type_bk": "Локальная заявка",
+          "type_hd": "Разрывы",
+          "district": "Нижегородский",
+          "address": "Город Москва, ул.3-я Карачаровская, д. 8 к 2",
+          "lat": 55.7295,
+          "lon": 37.7205,
+          "tw_start": 540,
+          "tw_end": 570,
+          "service_time": 40,
+          "priority": "local",
+          "required_skills": [
+            "basic"
+          ],
+          "required_equipment": [
+            "cable_kit"
+          ]
+        },
+        {
+          "task_id": 48227,
+          "type_bk": "Локальная заявка",
+          "type_hd": "Нет линка",
+          "district": "Таганский",
+          "address": "Город Москва, ул.Талалихина, д. 16",
+          "lat": 55.7406,
+          "lon": 37.6538,
+          "tw_start": 540,
+          "tw_end": 570,
+          "service_time": 30,
+          "priority": "local",
+          "required_skills": [
+            "basic"
+          ],
+          "required_equipment": []
+        },
+        {
+          "task_id": 21571,
+          "type_bk": "Локальная заявка",
+          "type_hd": "Нет линка",
+          "district": "Таганский",
+          "address": "Город Москва, пер.Большой Рогожский, д. 10 к 2",
+          "lat": 55.7406,
+          "lon": 37.6538,
+          "tw_start": 540,
+          "tw_end": 660,
+          "service_time": 30,
+          "priority": "local",
+          "required_skills": [
+            "basic"
+          ],
+          "required_equipment": []
+        },
+        {
+          "task_id": 17892,
+          "type_bk": "Локальная заявка",
+          "type_hd": "Переключение на Гбит/с",
+          "district": "Текстильщики",
+          "address": "Город Москва, ул.11-я Текстильщиков, д. 10",
+          "lat": 55.7087,
+          "lon": 37.7445,
+          "tw_start": 540,
+          "tw_end": 660,
+          "service_time": 50,
+          "priority": "local",
+          "required_skills": [
+            "basic"
+          ],
+          "required_equipment": []
+        },
+        {
+          "task_id": 57299,
+          "type_bk": "Глобальная проблема",
+          "type_hd": "Авария",
+          "district": "Кузьминки",
+          "address": "г.Город Москва, пр-кт.Волгоградский, д. 128к1",
+          "lat": 55.6945,
+          "lon": 37.7735,
+          "tw_start": 660,
+          "tw_end": 780,
+          "service_time": 100,
+          "priority": "emergency",
+          "required_skills": [
+            "basic",
+            "emergency"
+          ],
+          "required_equipment": []
+        }
+      ]
+    }
+  ],
+  "assigned": [
+    {
+      "task_id": 23380,
+      "engineer_id": "eng_00",
+      "engineer_name": "Соколов",
+      "arrival_min": 553,
+      "start_min": 553,
+      "end_min": 613,
+      "tw_start": 540,
+      "tw_end": 570,
+      "priority": "connection",
+      "position_in_route": 0,
+      "late_min": 0,
+      "explanation": "совпали спец.навыки: fmc; попадает в окно SLA"
+    },
+    {
+      "task_id": 74949,
+      "engineer_id": "eng_00",
+      "engineer_name": "Соколов",
+      "arrival_min": 613,
+      "start_min": 613,
+      "end_min": 673,
+      "tw_start": 540,
+      "tw_end": 570,
+      "priority": "connection",
+      "position_in_route": 1,
+      "late_min": 43,
+      "explanation": "совпали спец.навыки: fmc; опоздание 43 мин — компромисс оптимизации"
+    },
+    {
+      "task_id": 86160,
+      "engineer_id": "eng_00",
+      "engineer_name": "Соколов",
+      "arrival_min": 673,
+      "start_min": 673,
+      "end_min": 733,
+      "tw_start": 540,
+      "tw_end": 660,
+      "priority": "connection",
+      "position_in_route": 2,
+      "late_min": 13,
+      "explanation": "совпали спец.навыки: fmc; опоздание 13 мин — компромисс оптимизации"
+    },
+    {
+      "task_id": 30243,
+      "engineer_id": "eng_00",
+      "engineer_name": "Соколов",
+      "arrival_min": 733,
+      "start_min": 733,
+      "end_min": 773,
+      "tw_start": 540,
+      "tw_end": 660,
+      "priority": "local",
+      "position_in_route": 3,
+      "late_min": 73,
+      "explanation": "базовая квалификация подходит; есть оборудование: tv_box; опоздание 73 мин — компромисс оптимизации"
+    },
+    {
+      "task_id": 47670,
+      "engineer_id": "eng_00",
+      "engineer_name": "Соколов",
+      "arrival_min": 778,
+      "start_min": 778,
+      "end_min": 808,
+      "tw_start": 660,
+      "tw_end": 780,
+      "priority": "local",
+      "position_in_route": 4,
+      "late_min": 0,
+      "explanation": "базовая квалификация подходит; попадает в окно SLA"
+    },
+    {
+      "task_id": 98815,
+      "engineer_id": "eng_00",
+      "engineer_name": "Соколов",
+      "arrival_min": 812,
+      "start_min": 812,
+      "end_min": 857,
+      "tw_start": 540,
+      "tw_end": 660,
+      "priority": "extra",
+      "position_in_route": 5,
+      "late_min": 152,
+      "explanation": "совпали спец.навыки: fmc; опоздание 152 мин — компромисс оптимизации"
+    },
+    {
+      "task_id": 41077,
+      "engineer_id": "eng_01",
+      "engineer_name": "Мельников",
+      "arrival_min": 553,
+      "start_min": 553,
+      "end_min": 613,
+      "tw_start": 540,
+      "tw_end": 570,
+      "priority": "connection",
+      "position_in_route": 0,
+      "late_min": 0,
+      "explanation": "совпали спец.навыки: fmc; попадает в окно SLA"
+    },
+    {
+      "task_id": 37272,
+      "engineer_id": "eng_01",
+      "engineer_name": "Мельников",
+      "arrival_min": 613,
+      "start_min": 613,
+      "end_min": 673,
+      "tw_start": 540,
+      "tw_end": 570,
+      "priority": "connection",
+      "position_in_route": 1,
+      "late_min": 43,
+      "explanation": "совпали спец.навыки: fmc; опоздание 43 мин — компромисс оптимизации"
+    },
+    {
+      "task_id": 76643,
+      "engineer_id": "eng_01",
+      "engineer_name": "Мельников",
+      "arrival_min": 673,
+      "start_min": 673,
+      "end_min": 703,
+      "tw_start": 540,
+      "tw_end": 660,
+      "priority": "local",
+      "position_in_route": 2,
+      "late_min": 13,
+      "explanation": "базовая квалификация подходит; опоздание 13 мин — компромисс оптимизации"
+    },
+    {
+      "task_id": 17349,
+      "engineer_id": "eng_01",
+      "engineer_name": "Мельников",
+      "arrival_min": 703,
+      "start_min": 703,
+      "end_min": 743,
+      "tw_start": 540,
+      "tw_end": 570,
+      "priority": "local",
+      "position_in_route": 3,
+      "late_min": 133,
+      "explanation": "базовая квалификация подходит; опоздание 133 мин — компромисс оптимизации"
+    },
+    {
+      "task_id": 24076,
+      "engineer_id": "eng_01",
+      "engineer_name": "Мельников",
+      "arrival_min": 743,
+      "start_min": 743,
+      "end_min": 788,
+      "tw_start": 540,
+      "tw_end": 570,
+      "priority": "local",
+      "position_in_route": 4,
+      "late_min": 173,
+      "explanation": "базовая квалификация подходит; есть оборудование: router; опоздание 173 мин — компромисс оптимизации"
+    },
+    {
+      "task_id": 22634,
+      "engineer_id": "eng_01",
+      "engineer_name": "Мельников",
+      "arrival_min": 788,
+      "start_min": 788,
+      "end_min": 833,
+      "tw_start": 540,
+      "tw_end": 570,
+      "priority": "extra",
+      "position_in_route": 5,
+      "late_min": 218,
+      "explanation": "совпали спец.навыки: fmc; опоздание 218 мин — компромисс оптимизации"
+    },
+    {
+      "task_id": 71388,
+      "engineer_id": "eng_02",
+      "engineer_name": "Матвеев",
+      "arrival_min": 544,
+      "start_min": 544,
+      "end_min": 604,
+      "tw_start": 540,
+      "tw_end": 570,
+      "priority": "connection",
+      "position_in_route": 0,
+      "late_min": 0,
+      "explanation": "совпали спец.навыки: fmc; попадает в окно SLA"
+    },
+    {
+      "task_id": 34366,
+      "engineer_id": "eng_02",
+      "engineer_name": "Матвеев",
+      "arrival_min": 604,
+      "start_min": 604,
+      "end_min": 664,
+      "tw_start": 540,
+      "tw_end": 570,
+      "priority": "connection",
+      "position_in_route": 1,
+      "late_min": 34,
+      "explanation": "совпали спец.навыки: fmc; опоздание 34 мин — компромисс оптимизации"
+    },
+    {
+      "task_id": 30769,
+      "engineer_id": "eng_02",
+      "engineer_name": "Матвеев",
+      "arrival_min": 664,
+      "start_min": 664,
+      "end_min": 724,
+      "tw_start": 540,
+      "tw_end": 570,
+      "priority": "connection",
+      "position_in_route": 2,
+      "late_min": 94,
+      "explanation": "совпали спец.навыки: fmc; опоздание 94 мин — компромисс оптимизации"
+    },
+    {
+      "task_id": 60720,
+      "engineer_id": "eng_02",
+      "engineer_name": "Матвеев",
+      "arrival_min": 724,
+      "start_min": 724,
+      "end_min": 754,
+      "tw_start": 540,
+      "tw_end": 570,
+      "priority": "local",
+      "position_in_route": 3,
+      "late_min": 154,
+      "explanation": "базовая квалификация подходит; опоздание 154 мин — компромисс оптимизации"
+    },
+    {
+      "task_id": 48174,
+      "engineer_id": "eng_02",
+      "engineer_name": "Матвеев",
+      "arrival_min": 760,
+      "start_min": 760,
+      "end_min": 785,
+      "tw_start": 540,
+      "tw_end": 660,
+      "priority": "local",
+      "position_in_route": 4,
+      "late_min": 100,
+      "explanation": "базовая квалификация подходит; опоздание 100 мин — компромисс оптимизации"
+    },
+    {
+      "task_id": 92031,
+      "engineer_id": "eng_02",
+      "engineer_name": "Матвеев",
+      "arrival_min": 798,
+      "start_min": 798,
+      "end_min": 843,
+      "tw_start": 540,
+      "tw_end": 660,
+      "priority": "extra",
+      "position_in_route": 5,
+      "late_min": 138,
+      "explanation": "совпали спец.навыки: fmc; опоздание 138 мин — компромисс оптимизации"
+    },
+    {
+      "task_id": 82388,
+      "engineer_id": "eng_03",
+      "engineer_name": "Попов",
+      "arrival_min": 550,
+      "start_min": 550,
+      "end_min": 610,
+      "tw_start": 540,
+      "tw_end": 570,
+      "priority": "connection",
+      "position_in_route": 0,
+      "late_min": 0,
+      "explanation": "совпали спец.навыки: fmc; попадает в окно SLA"
+    },
+    {
+      "task_id": 35675,
+      "engineer_id": "eng_03",
+      "engineer_name": "Попов",
+      "arrival_min": 610,
+      "start_min": 610,
+      "end_min": 670,
+      "tw_start": 540,
+      "tw_end": 570,
+      "priority": "connection",
+      "position_in_route": 1,
+      "late_min": 40,
+      "explanation": "совпали спец.навыки: fmc; опоздание 40 мин — компромисс оптимизации"
+    },
+    {
+      "task_id": 94409,
+      "engineer_id": "eng_03",
+      "engineer_name": "Попов",
+      "arrival_min": 679,
+      "start_min": 679,
+      "end_min": 739,
+      "tw_start": 540,
+      "tw_end": 570,
+      "priority": "connection",
+      "position_in_route": 2,
+      "late_min": 109,
+      "explanation": "совпали спец.навыки: fmc; опоздание 109 мин — компромисс оптимизации"
+    },
+    {
+      "task_id": 47330,
+      "engineer_id": "eng_03",
+      "engineer_name": "Попов",
+      "arrival_min": 739,
+      "start_min": 739,
+      "end_min": 784,
+      "tw_start": 540,
+      "tw_end": 570,
+      "priority": "local",
+      "position_in_route": 3,
+      "late_min": 169,
+      "explanation": "базовая квалификация подходит; есть оборудование: router; опоздание 169 мин — компромисс оптимизации"
+    },
+    {
+      "task_id": 69967,
+      "engineer_id": "eng_03",
+      "engineer_name": "Попов",
+      "arrival_min": 784,
+      "start_min": 784,
+      "end_min": 889,
+      "tw_start": 540,
+      "tw_end": 570,
+      "priority": "extra",
+      "position_in_route": 4,
+      "late_min": 214,
+      "explanation": "совпали спец.навыки: fttb, gigabit; есть оборудование: gigabit_kit; опоздание 214 мин — компромисс оптимизации"
+    },
+    {
+      "task_id": 77563,
+      "engineer_id": "eng_04",
+      "engineer_name": "Арташкин",
+      "arrival_min": 545,
+      "start_min": 545,
+      "end_min": 605,
+      "tw_start": 540,
+      "tw_end": 570,
+      "priority": "connection",
+      "position_in_route": 0,
+      "late_min": 0,
+      "explanation": "совпали спец.навыки: fmc; попадает в окно SLA"
+    },
+    {
+      "task_id": 61540,
+      "engineer_id": "eng_04",
+      "engineer_name": "Арташкин",
+      "arrival_min": 605,
+      "start_min": 605,
+      "end_min": 665,
+      "tw_start": 540,
+      "tw_end": 570,
+      "priority": "connection",
+      "position_in_route": 1,
+      "late_min": 35,
+      "explanation": "совпали спец.навыки: fmc; опоздание 35 мин — компромисс оптимизации"
+    },
+    {
+      "task_id": 10245,
+      "engineer_id": "eng_04",
+      "engineer_name": "Арташкин",
+      "arrival_min": 665,
+      "start_min": 665,
+      "end_min": 725,
+      "tw_start": 540,
+      "tw_end": 570,
+      "priority": "connection",
+      "position_in_route": 2,
+      "late_min": 95,
+      "explanation": "совпали спец.навыки: fmc; опоздание 95 мин — компромисс оптимизации"
+    },
+    {
+      "task_id": 32807,
+      "engineer_id": "eng_04",
+      "engineer_name": "Арташкин",
+      "arrival_min": 725,
+      "start_min": 725,
+      "end_min": 775,
+      "tw_start": 540,
+      "tw_end": 570,
+      "priority": "local",
+      "position_in_route": 3,
+      "late_min": 155,
+      "explanation": "базовая квалификация подходит; есть оборудование: cable_kit; опоздание 155 мин — компромисс оптимизации"
+    },
+    {
+      "task_id": 84627,
+      "engineer_id": "eng_04",
+      "engineer_name": "Арташкин",
+      "arrival_min": 775,
+      "start_min": 775,
+      "end_min": 835,
+      "tw_start": 660,
+      "tw_end": 780,
+      "priority": "connection",
+      "position_in_route": 4,
+      "late_min": 0,
+      "explanation": "совпали спец.навыки: fmc; попадает в окно SLA"
+    },
+    {
+      "task_id": 57866,
+      "engineer_id": "eng_05",
+      "engineer_name": "Комарь",
+      "arrival_min": 551,
+      "start_min": 551,
+      "end_min": 611,
+      "tw_start": 540,
+      "tw_end": 570,
+      "priority": "connection",
+      "position_in_route": 0,
+      "late_min": 0,
+      "explanation": "совпали спец.навыки: fmc; попадает в окно SLA"
+    },
+    {
+      "task_id": 52405,
+      "engineer_id": "eng_05",
+      "engineer_name": "Комарь",
+      "arrival_min": 611,
+      "start_min": 611,
+      "end_min": 671,
+      "tw_start": 540,
+      "tw_end": 570,
+      "priority": "connection",
+      "position_in_route": 1,
+      "late_min": 41,
+      "explanation": "совпали спец.навыки: fmc; опоздание 41 мин — компромисс оптимизации"
+    },
+    {
+      "task_id": 10135,
+      "engineer_id": "eng_05",
+      "engineer_name": "Комарь",
+      "arrival_min": 671,
+      "start_min": 671,
+      "end_min": 731,
+      "tw_start": 540,
+      "tw_end": 660,
+      "priority": "connection",
+      "position_in_route": 2,
+      "late_min": 11,
+      "explanation": "совпали спец.навыки: fmc; опоздание 11 мин — компромисс оптимизации"
+    },
+    {
+      "task_id": 51115,
+      "engineer_id": "eng_05",
+      "engineer_name": "Комарь",
+      "arrival_min": 731,
+      "start_min": 731,
+      "end_min": 761,
+      "tw_start": 540,
+      "tw_end": 660,
+      "priority": "local",
+      "position_in_route": 3,
+      "late_min": 71,
+      "explanation": "базовая квалификация подходит; опоздание 71 мин — компромисс оптимизации"
+    },
+    {
+      "task_id": 46393,
+      "engineer_id": "eng_05",
+      "engineer_name": "Комарь",
+      "arrival_min": 761,
+      "start_min": 761,
+      "end_min": 821,
+      "tw_start": 660,
+      "tw_end": 780,
+      "priority": "connection",
+      "position_in_route": 4,
+      "late_min": 0,
+      "explanation": "совпали спец.навыки: fmc; попадает в окно SLA"
+    },
+    {
+      "task_id": 53587,
+      "engineer_id": "eng_06",
+      "engineer_name": "Каушнян",
+      "arrival_min": 544,
+      "start_min": 544,
+      "end_min": 604,
+      "tw_start": 540,
+      "tw_end": 570,
+      "priority": "connection",
+      "position_in_route": 0,
+      "late_min": 0,
+      "explanation": "совпали спец.навыки: fmc; попадает в окно SLA"
+    },
+    {
+      "task_id": 87693,
+      "engineer_id": "eng_06",
+      "engineer_name": "Каушнян",
+      "arrival_min": 604,
+      "start_min": 604,
+      "end_min": 664,
+      "tw_start": 540,
+      "tw_end": 570,
+      "priority": "connection",
+      "position_in_route": 1,
+      "late_min": 34,
+      "explanation": "совпали спец.навыки: fmc; опоздание 34 мин — компромисс оптимизации"
+    },
+    {
+      "task_id": 50104,
+      "engineer_id": "eng_06",
+      "engineer_name": "Каушнян",
+      "arrival_min": 664,
+      "start_min": 664,
+      "end_min": 744,
+      "tw_start": 540,
+      "tw_end": 660,
+      "priority": "connection",
+      "position_in_route": 2,
+      "late_min": 4,
+      "explanation": "совпали спец.навыки: gigabit; есть оборудование: gigabit_kit; опоздание 4 мин — компромисс оптимизации"
+    },
+    {
+      "task_id": 73572,
+      "engineer_id": "eng_06",
+      "engineer_name": "Каушнян",
+      "arrival_min": 750,
+      "start_min": 750,
+      "end_min": 780,
+      "tw_start": 540,
+      "tw_end": 570,
+      "priority": "local",
+      "position_in_route": 3,
+      "late_min": 180,
+      "explanation": "базовая квалификация подходит; опоздание 180 мин — компромисс оптимизации"
+    },
+    {
+      "task_id": 74198,
+      "engineer_id": "eng_06",
+      "engineer_name": "Каушнян",
+      "arrival_min": 780,
+      "start_min": 780,
+      "end_min": 840,
+      "tw_start": 660,
+      "tw_end": 780,
+      "priority": "connection",
+      "position_in_route": 4,
+      "late_min": 0,
+      "explanation": "совпали спец.навыки: fmc; попадает в окно SLA"
+    },
+    {
+      "task_id": 93086,
+      "engineer_id": "eng_07",
+      "engineer_name": "Зверев",
+      "arrival_min": 551,
+      "start_min": 551,
+      "end_min": 611,
+      "tw_start": 540,
+      "tw_end": 570,
+      "priority": "connection",
+      "position_in_route": 0,
+      "late_min": 0,
+      "explanation": "совпали спец.навыки: fmc; попадает в окно SLA"
+    },
+    {
+      "task_id": 7939,
+      "engineer_id": "eng_07",
+      "engineer_name": "Зверев",
+      "arrival_min": 611,
+      "start_min": 611,
+      "end_min": 671,
+      "tw_start": 540,
+      "tw_end": 570,
+      "priority": "connection",
+      "position_in_route": 1,
+      "late_min": 41,
+      "explanation": "совпали спец.навыки: fmc; опоздание 41 мин — компромисс оптимизации"
+    },
+    {
+      "task_id": 18754,
+      "engineer_id": "eng_07",
+      "engineer_name": "Зверев",
+      "arrival_min": 671,
+      "start_min": 671,
+      "end_min": 731,
+      "tw_start": 540,
+      "tw_end": 660,
+      "priority": "connection",
+      "position_in_route": 2,
+      "late_min": 11,
+      "explanation": "совпали спец.навыки: fmc; опоздание 11 мин — компромисс оптимизации"
+    },
+    {
+      "task_id": 48238,
+      "engineer_id": "eng_07",
+      "engineer_name": "Зверев",
+      "arrival_min": 739,
+      "start_min": 739,
+      "end_min": 779,
+      "tw_start": 540,
+      "tw_end": 570,
+      "priority": "local",
+      "position_in_route": 3,
+      "late_min": 169,
+      "explanation": "базовая квалификация подходит; есть оборудование: cable_kit; опоздание 169 мин — компромисс оптимизации"
+    },
+    {
+      "task_id": 21367,
+      "engineer_id": "eng_07",
+      "engineer_name": "Зверев",
+      "arrival_min": 779,
+      "start_min": 779,
+      "end_min": 879,
+      "tw_start": 660,
+      "tw_end": 780,
+      "priority": "emergency",
+      "position_in_route": 4,
+      "late_min": 0,
+      "explanation": "базовая квалификация подходит; попадает в окно SLA"
+    },
+    {
+      "task_id": 29890,
+      "engineer_id": "eng_08",
+      "engineer_name": "Перов",
+      "arrival_min": 552,
+      "start_min": 552,
+      "end_min": 612,
+      "tw_start": 540,
+      "tw_end": 570,
+      "priority": "connection",
+      "position_in_route": 0,
+      "late_min": 0,
+      "explanation": "совпали спец.навыки: fmc; попадает в окно SLA"
+    },
+    {
+      "task_id": 82808,
+      "engineer_id": "eng_08",
+      "engineer_name": "Перов",
+      "arrival_min": 612,
+      "start_min": 612,
+      "end_min": 672,
+      "tw_start": 540,
+      "tw_end": 570,
+      "priority": "connection",
+      "position_in_route": 1,
+      "late_min": 42,
+      "explanation": "совпали спец.навыки: fmc; опоздание 42 мин — компромисс оптимизации"
+    },
+    {
+      "task_id": 76082,
+      "engineer_id": "eng_08",
+      "engineer_name": "Перов",
+      "arrival_min": 672,
+      "start_min": 672,
+      "end_min": 762,
+      "tw_start": 540,
+      "tw_end": 570,
+      "priority": "connection",
+      "position_in_route": 2,
+      "late_min": 102,
+      "explanation": "совпали спец.навыки: fttb; опоздание 102 мин — компромисс оптимизации"
+    },
+    {
+      "task_id": 33527,
+      "engineer_id": "eng_08",
+      "engineer_name": "Перов",
+      "arrival_min": 762,
+      "start_min": 762,
+      "end_min": 807,
+      "tw_start": 540,
+      "tw_end": 570,
+      "priority": "extra",
+      "position_in_route": 3,
+      "late_min": 192,
+      "explanation": "совпали спец.навыки: fmc; опоздание 192 мин — компромисс оптимизации"
+    },
+    {
+      "task_id": 31260,
+      "engineer_id": "eng_08",
+      "engineer_name": "Перов",
+      "arrival_min": 820,
+      "start_min": 820,
+      "end_min": 865,
+      "tw_start": 660,
+      "tw_end": 780,
+      "priority": "extra",
+      "position_in_route": 4,
+      "late_min": 40,
+      "explanation": "совпали спец.навыки: fmc; опоздание 40 мин — компромисс оптимизации"
+    },
+    {
+      "task_id": 67554,
+      "engineer_id": "eng_09",
+      "engineer_name": "Белузин",
+      "arrival_min": 552,
+      "start_min": 552,
+      "end_min": 602,
+      "tw_start": 540,
+      "tw_end": 570,
+      "priority": "connection",
+      "position_in_route": 0,
+      "late_min": 0,
+      "explanation": "базовая квалификация подходит; попадает в окно SLA"
+    },
+    {
+      "task_id": 50219,
+      "engineer_id": "eng_09",
+      "engineer_name": "Белузин",
+      "arrival_min": 602,
+      "start_min": 602,
+      "end_min": 632,
+      "tw_start": 540,
+      "tw_end": 570,
+      "priority": "local",
+      "position_in_route": 1,
+      "late_min": 32,
+      "explanation": "базовая квалификация подходит; опоздание 32 мин — компромисс оптимизации"
+    },
+    {
+      "task_id": 41912,
+      "engineer_id": "eng_09",
+      "engineer_name": "Белузин",
+      "arrival_min": 645,
+      "start_min": 645,
+      "end_min": 675,
+      "tw_start": 540,
+      "tw_end": 570,
+      "priority": "local",
+      "position_in_route": 2,
+      "late_min": 75,
+      "explanation": "базовая квалификация подходит; опоздание 75 мин — компромисс оптимизации"
+    },
+    {
+      "task_id": 54964,
+      "engineer_id": "eng_09",
+      "engineer_name": "Белузин",
+      "arrival_min": 675,
+      "start_min": 675,
+      "end_min": 715,
+      "tw_start": 540,
+      "tw_end": 570,
+      "priority": "local",
+      "position_in_route": 3,
+      "late_min": 105,
+      "explanation": "базовая квалификация подходит; опоздание 105 мин — компромисс оптимизации"
+    },
+    {
+      "task_id": 41962,
+      "engineer_id": "eng_09",
+      "engineer_name": "Белузин",
+      "arrival_min": 715,
+      "start_min": 715,
+      "end_min": 755,
+      "tw_start": 540,
+      "tw_end": 570,
+      "priority": "local",
+      "position_in_route": 4,
+      "late_min": 145,
+      "explanation": "базовая квалификация подходит; опоздание 145 мин — компромисс оптимизации"
+    },
+    {
+      "task_id": 97886,
+      "engineer_id": "eng_09",
+      "engineer_name": "Белузин",
+      "arrival_min": 755,
+      "start_min": 755,
+      "end_min": 795,
+      "tw_start": 540,
+      "tw_end": 570,
+      "priority": "local",
+      "position_in_route": 5,
+      "late_min": 185,
+      "explanation": "базовая квалификация подходит; опоздание 185 мин — компромисс оптимизации"
+    },
+    {
+      "task_id": 43506,
+      "engineer_id": "eng_09",
+      "engineer_name": "Белузин",
+      "arrival_min": 795,
+      "start_min": 795,
+      "end_min": 845,
+      "tw_start": 660,
+      "tw_end": 780,
+      "priority": "local",
+      "position_in_route": 6,
+      "late_min": 15,
+      "explanation": "базовая квалификация подходит; опоздание 15 мин — компромисс оптимизации"
+    },
+    {
+      "task_id": 24980,
+      "engineer_id": "eng_10",
+      "engineer_name": "Гусаковский",
+      "arrival_min": 557,
+      "start_min": 557,
+      "end_min": 657,
+      "tw_start": 540,
+      "tw_end": 570,
+      "priority": "emergency",
+      "position_in_route": 0,
+      "late_min": 0,
+      "explanation": "базовая квалификация подходит; попадает в окно SLA"
+    },
+    {
+      "task_id": 4893,
+      "engineer_id": "eng_10",
+      "engineer_name": "Гусаковский",
+      "arrival_min": 657,
+      "start_min": 657,
+      "end_min": 687,
+      "tw_start": 540,
+      "tw_end": 570,
+      "priority": "local",
+      "position_in_route": 1,
+      "late_min": 87,
+      "explanation": "базовая квалификация подходит; опоздание 87 мин — компромисс оптимизации"
+    },
+    {
+      "task_id": 15648,
+      "engineer_id": "eng_10",
+      "engineer_name": "Гусаковский",
+      "arrival_min": 687,
+      "start_min": 687,
+      "end_min": 727,
+      "tw_start": 540,
+      "tw_end": 570,
+      "priority": "local",
+      "position_in_route": 2,
+      "late_min": 117,
+      "explanation": "базовая квалификация подходит; опоздание 117 мин — компромисс оптимизации"
+    },
+    {
+      "task_id": 26645,
+      "engineer_id": "eng_10",
+      "engineer_name": "Гусаковский",
+      "arrival_min": 731,
+      "start_min": 731,
+      "end_min": 771,
+      "tw_start": 540,
+      "tw_end": 570,
+      "priority": "local",
+      "position_in_route": 3,
+      "late_min": 161,
+      "explanation": "базовая квалификация подходит; есть оборудование: tv_box; опоздание 161 мин — компромисс оптимизации"
+    },
+    {
+      "task_id": 76678,
+      "engineer_id": "eng_10",
+      "engineer_name": "Гусаковский",
+      "arrival_min": 771,
+      "start_min": 771,
+      "end_min": 821,
+      "tw_start": 540,
+      "tw_end": 570,
+      "priority": "local",
+      "position_in_route": 4,
+      "late_min": 201,
+      "explanation": "базовая квалификация подходит; есть оборудование: cable_kit; опоздание 201 мин — компромисс оптимизации"
+    },
+    {
+      "task_id": 98182,
+      "engineer_id": "eng_11",
+      "engineer_name": "Свеженцев",
+      "arrival_min": 552,
+      "start_min": 552,
+      "end_min": 602,
+      "tw_start": 540,
+      "tw_end": 570,
+      "priority": "connection",
+      "position_in_route": 0,
+      "late_min": 0,
+      "explanation": "базовая квалификация подходит; попадает в окно SLA"
+    },
+    {
+      "task_id": 68476,
+      "engineer_id": "eng_11",
+      "engineer_name": "Свеженцев",
+      "arrival_min": 602,
+      "start_min": 602,
+      "end_min": 642,
+      "tw_start": 540,
+      "tw_end": 570,
+      "priority": "local",
+      "position_in_route": 1,
+      "late_min": 32,
+      "explanation": "базовая квалификация подходит; есть оборудование: cable_kit; опоздание 32 мин — компромисс оптимизации"
+    },
+    {
+      "task_id": 48227,
+      "engineer_id": "eng_11",
+      "engineer_name": "Свеженцев",
+      "arrival_min": 652,
+      "start_min": 652,
+      "end_min": 682,
+      "tw_start": 540,
+      "tw_end": 570,
+      "priority": "local",
+      "position_in_route": 2,
+      "late_min": 82,
+      "explanation": "базовая квалификация подходит; опоздание 82 мин — компромисс оптимизации"
+    },
+    {
+      "task_id": 21571,
+      "engineer_id": "eng_11",
+      "engineer_name": "Свеженцев",
+      "arrival_min": 682,
+      "start_min": 682,
+      "end_min": 712,
+      "tw_start": 540,
+      "tw_end": 660,
+      "priority": "local",
+      "position_in_route": 3,
+      "late_min": 22,
+      "explanation": "базовая квалификация подходит; опоздание 22 мин — компромисс оптимизации"
+    },
+    {
+      "task_id": 17892,
+      "engineer_id": "eng_11",
+      "engineer_name": "Свеженцев",
+      "arrival_min": 722,
+      "start_min": 722,
+      "end_min": 772,
+      "tw_start": 540,
+      "tw_end": 660,
+      "priority": "local",
+      "position_in_route": 4,
+      "late_min": 62,
+      "explanation": "базовая квалификация подходит; опоздание 62 мин — компромисс оптимизации"
+    },
+    {
+      "task_id": 57299,
+      "engineer_id": "eng_11",
+      "engineer_name": "Свеженцев",
+      "arrival_min": 778,
+      "start_min": 778,
+      "end_min": 878,
+      "tw_start": 660,
+      "tw_end": 780,
+      "priority": "emergency",
+      "position_in_route": 5,
+      "late_min": 0,
+      "explanation": "базовая квалификация подходит; попадает в окно SLA"
+    }
+  ],
+  "unassigned": [],
+  "ml_metrics": {
+    "status": "OK",
+    "total_tasks": 66,
+    "assigned": 66,
+    "unassigned": 0,
+    "assigned_rate": 1.0,
+    "engineers_used": 12,
+    "total_distance_km": 224.36,
+    "total_time_min": 3853,
+    "total_travel_min": 358,
+    "late_count": 48,
+    "total_late_min": 4457,
+    "overtime_min": 0,
+    "load_mean": 5.5,
+    "load_std": 0.65,
+    "load_max": 7,
+    "load_min": 5
+  }
+}

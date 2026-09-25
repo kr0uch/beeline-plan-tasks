@@ -1,0 +1,257 @@
+[
+  {
+    "id": "eng_00",
+    "name": "Паршин",
+    "skills": [
+      "basic",
+      "emergency",
+      "fmc"
+    ],
+    "equipment": [
+      "router",
+      "tv_box",
+      "cable_kit",
+      "optics_kit"
+    ],
+    "transport": "car",
+    "shift_start": 540,
+    "shift_end": 1320,
+    "depot_lat": 55.4405,
+    "depot_lon": 37.7555,
+    "depot_address": "Домодедово"
+  },
+  {
+    "id": "eng_01",
+    "name": "Андреев",
+    "skills": [
+      "basic",
+      "emergency",
+      "fmc"
+    ],
+    "equipment": [
+      "router",
+      "tv_box",
+      "cable_kit",
+      "optics_kit"
+    ],
+    "transport": "car",
+    "shift_start": 540,
+    "shift_end": 1320,
+    "depot_lat": 55.5876,
+    "depot_lon": 37.6572,
+    "depot_address": "г. Москва, ул Бирюлёвская, д 1с1"
+  },
+  {
+    "id": "eng_02",
+    "name": "Белоновский",
+    "skills": [
+      "basic",
+      "emergency",
+      "fmc",
+      "gigabit"
+    ],
+    "equipment": [
+      "router",
+      "tv_box",
+      "cable_kit",
+      "optics_kit",
+      "gigabit_kit"
+    ],
+    "transport": "car",
+    "shift_start": 540,
+    "shift_end": 1320,
+    "depot_lat": 55.5876,
+    "depot_lon": 37.6572,
+    "depot_address": "г. Москва, ул Бирюлёвская, д 1с1"
+  },
+  {
+    "id": "eng_03",
+    "name": "Рыбин",
+    "skills": [
+      "basic",
+      "emergency",
+      "fmc",
+      "gigabit"
+    ],
+    "equipment": [
+      "router",
+      "tv_box",
+      "cable_kit",
+      "optics_kit",
+      "gigabit_kit"
+    ],
+    "transport": "car",
+    "shift_start": 540,
+    "shift_end": 1320,
+    "depot_lat": 55.5876,
+    "depot_lon": 37.6572,
+    "depot_address": "г. Москва, ул Бирюлёвская, д 1с1"
+  },
+  {
+    "id": "eng_04",
+    "name": "Горбанев",
+    "skills": [
+      "basic",
+      "emergency",
+      "fmc"
+    ],
+    "equipment": [
+      "router",
+      "tv_box",
+      "cable_kit",
+      "optics_kit"
+    ],
+    "transport": "car",
+    "shift_start": 540,
+    "shift_end": 1320,
+    "depot_lat": 55.5876,
+    "depot_lon": 37.6572,
+    "depot_address": "г. Москва, ул Бирюлёвская, д 1с1"
+  },
+  {
+    "id": "eng_05",
+    "name": "Бузань",
+    "skills": [
+      "basic",
+      "emergency",
+      "fmc"
+    ],
+    "equipment": [
+      "router",
+      "tv_box",
+      "cable_kit",
+      "optics_kit"
+    ],
+    "transport": "car",
+    "shift_start": 540,
+    "shift_end": 1320,
+    "depot_lat": 55.5876,
+    "depot_lon": 37.6572,
+    "depot_address": "г. Москва, ул Бирюлёвская, д 1с1"
+  },
+  {
+    "id": "eng_06",
+    "name": "Козырь",
+    "skills": [
+      "basic",
+      "emergency",
+      "fmc"
+    ],
+    "equipment": [
+      "router",
+      "tv_box",
+      "cable_kit",
+      "optics_kit"
+    ],
+    "transport": "car",
+    "shift_start": 540,
+    "shift_end": 1320,
+    "depot_lat": 54.8975,
+    "depot_lon": 38.0785,
+    "depot_address": "Ступино"
+  },
+  {
+    "id": "eng_07",
+    "name": "Саламатин",
+    "skills": [
+      "basic",
+      "emergency",
+      "fmc"
+    ],
+    "equipment": [
+      "router",
+      "tv_box",
+      "cable_kit",
+      "optics_kit"
+    ],
+    "transport": "car",
+    "shift_start": 540,
+    "shift_end": 1320,
+    "depot_lat": 54.8335,
+    "depot_lon": 38.1665,
+    "depot_address": "Кашира"
+  },
+  {
+    "id": "eng_08",
+    "name": "Макаров",
+    "skills": [
+      "basic",
+      "emergency",
+      "fmc",
+      "fttb"
+    ],
+    "equipment": [
+      "router",
+      "tv_box",
+      "cable_kit",
+      "optics_kit"
+    ],
+    "transport": "car",
+    "shift_start": 540,
+    "shift_end": 1320,
+    "depot_lat": 55.5876,
+    "depot_lon": 37.6572,
+    "depot_address": "г. Москва, ул Бирюлёвская, д 1с1"
+  },
+  {
+    "id": "eng_09",
+    "name": "Каушнян",
+    "skills": [
+      "basic",
+      "emergency",
+      "fmc"
+    ],
+    "equipment": [
+      "router",
+      "tv_box",
+      "cable_kit",
+      "optics_kit"
+    ],
+    "transport": "car",
+    "shift_start": 540,
+    "shift_end": 1320,
+    "depot_lat": 55.5876,
+    "depot_lon": 37.6572,
+    "depot_address": "г. Москва, ул Бирюлёвская, д 1с1"
+  },
+  {
+    "id": "eng_10",
+    "name": "Царьков",
+    "skills": [
+      "basic",
+      "emergency"
+    ],
+    "equipment": [
+      "router",
+      "tv_box",
+      "cable_kit",
+      "optics_kit"
+    ],
+    "transport": "car",
+    "shift_start": 540,
+    "shift_end": 1320,
+    "depot_lat": 55.5876,
+    "depot_lon": 37.6572,
+    "depot_address": "г. Москва, ул Бирюлёвская, д 1с1"
+  },
+  {
+    "id": "eng_11",
+    "name": "Демин",
+    "skills": [
+      "basic",
+      "emergency"
+    ],
+    "equipment": [
+      "router",
+      "tv_box",
+      "cable_kit",
+      "optics_kit"
+    ],
+    "transport": "car",
+    "shift_start": 540,
+    "shift_end": 1320,
+    "depot_lat": 55.5876,
+    "depot_lon": 37.6572,
+    "depot_address": "г. Москва, ул Бирюлёвская, д 1с1"
+  }
+]
