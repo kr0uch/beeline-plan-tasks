@@ -63,6 +63,34 @@ def _solve_and_respond(tasks, engineers, region_key, time_limit):
     points = depots + [(t["lat"], t["lon"]) for t in tasks]
     time_mat, dist_mat = build_matrix(points, region_key, use_osrm=True)
     result = solve_vrp(tasks, engineers, time_mat, dist_mat, time_limit_sec=time_limit)
+
+    # Если solver не нашёл решение — возвращаем корректный ответ с нулями
+    if result.metrics.get("status") == "NO_SOLUTION":
+        empty_metrics = {
+            "status": "NO_SOLUTION",
+            "total_tasks": len(tasks),
+            "assigned": 0,
+            "unassigned": len(tasks),
+            "assigned_rate": 0.0,
+            "engineers_used": 0,
+            "total_distance_km": 0.0,
+            "total_time_min": 0,
+            "total_travel_min": 0,
+            "late_count": 0,
+            "total_late_min": 0,
+            "overtime_min": 0,
+            "load_mean": 0.0,
+            "load_std": 0.0,
+            "load_max": 0,
+            "load_min": 0,
+        }
+        return PlanResponse(
+            routes=[], assigned=[],
+            unassigned=[{"task_id": t["id"], "reason": "no_solution",
+                         "explanation": "solver не нашёл решение"} for t in tasks],
+            ml_metrics=empty_metrics,
+        )
+
     _attach_explanations(result, tasks, engineers)
     return PlanResponse(
         routes=result.routes, assigned=result.assigned,

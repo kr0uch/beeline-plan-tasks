@@ -61,7 +61,7 @@ def solve_vrp(tasks, engineers, time_matrix, dist_matrix, time_limit_sec=20,
     dist_idx = routing.RegisterTransitCallback(dist_cb)
     routing.SetArcCostEvaluatorOfAllVehicles(time_idx)
 
-    routing.AddDimension(time_idx, 120, HORIZON_MIN + 900, False, "Time")
+    routing.AddDimension(time_idx, 1440, HORIZON_MIN + 900, False, "Time")
     time_dim = routing.GetDimensionOrDie("Time")
     time_dim.SetSpanCostCoefficientForAllVehicles(1)
 
