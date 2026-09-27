@@ -2,7 +2,7 @@ from __future__ import annotations
 import json
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import HTMLResponse, JSONResponse
-
+import hashlib
 from src.config import DATA_PROC, REGIONS, classify_priority
 from src.api.schemas import PlanRequest, ReplanRequest, PlanResponse
 from src.geo.geocode import geocode
@@ -61,7 +61,11 @@ def _solve_and_respond(tasks, engineers, region_key, time_limit):
         if key not in [(d[0], d[1]) for d in depots]:
             depots.append((e["depot_lat"], e["depot_lon"]))
     points = depots + [(t["lat"], t["lon"]) for t in tasks]
-    time_mat, dist_mat = build_matrix(points, region_key, use_osrm=True)
+    fp = hashlib.md5(
+        str([(round(p[0], 4), round(p[1], 4)) for p in points]).encode()
+    ).hexdigest()[:10]
+    unique_key = f"{region_key}_{fp}"
+    time_mat, dist_mat = build_matrix(points, unique_key, use_osrm=True)
     result = solve_vrp(tasks, engineers, time_mat, dist_mat, time_limit_sec=time_limit)
 
     # Если solver не нашёл решение — возвращаем корректный ответ с нулями

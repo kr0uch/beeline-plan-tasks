@@ -4,7 +4,7 @@ from src.geo.matrix import build_matrix
 from src.geo.geocode import geocode
 from src.ml.duration import predict_duration
 from src.solver.vrp import solve_vrp
-
+import hashlib
 
 def replan(region_name, new_task, current_state, pending_tasks, locked_tasks,
            engineers, time_limit_sec=15):
@@ -27,7 +27,10 @@ def replan(region_name, new_task, current_state, pending_tasks, locked_tasks,
     current_points = [(s["lat"], s["lon"]) for s in current_state.values()]
     points = depots + current_points + [(t["lat"], t["lon"]) for t in all_tasks]
 
-    region_key = f"replan_{region_name}_{len(points)}"
+    fp = hashlib.md5(
+        str([(round(p[0], 4), round(p[1], 4)) for p in points]).encode()
+    ).hexdigest()[:10]
+    region_key = f"replan_{region_name}_{fp}"
     time_mat, dist_mat = build_matrix(points, region_key, use_osrm=True)
 
     result = solve_vrp(
