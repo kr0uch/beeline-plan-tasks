@@ -15,7 +15,134 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/engineers": {
+            "get": {
+                "description": "ФИО, транспорт, навыки, оборудование, смена и депо каждой бригады; если план уже построен — маршрут и загрузка смены",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Бригады"
+                ],
+                "summary": "Бригады региона",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "регион планирования: east, southeast, southcenter",
+                        "name": "region",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dto.EngineerView"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "invalid region",
+                        "schema": {
+                            "$ref": "#/definitions/errors.HttpErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "region not found: no engineers file for region",
+                        "schema": {
+                            "$ref": "#/definitions/errors.HttpErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.HttpErrorResponse"
+                        }
+                    },
+                    "502": {
+                        "description": "geocoding service is unavailable | invalid response from external service",
+                        "schema": {
+                            "$ref": "#/definitions/errors.HttpErrorResponse"
+                        }
+                    },
+                    "504": {
+                        "description": "geocoding service timed out",
+                        "schema": {
+                            "$ref": "#/definitions/errors.HttpErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/health": {
+            "get": {
+                "description": "Статус бекенда и доступность ML-сервиса",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Служебное"
+                ],
+                "summary": "Состояние сервиса",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.HealthResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/plan": {
+            "get": {
+                "description": "Последний построенный или перепланированный план без пересчёта: маршруты, назначения с полными заявками, неназначенные с адресами и причинами, метрики",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Планирование"
+                ],
+                "summary": "Текущий план региона",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "регион планирования: east, southeast, southcenter",
+                        "name": "region",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.PlanResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "invalid region",
+                        "schema": {
+                            "$ref": "#/definitions/errors.HttpErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "plan for region not found, call POST /plan first",
+                        "schema": {
+                            "$ref": "#/definitions/errors.HttpErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.HttpErrorResponse"
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "Получает CSV файл через multipart/form-data по ключу \"tasks_file\" и выполняет оптимальную и неоптимальную планировку",
                 "consumes": [
@@ -42,6 +169,12 @@ const docTemplate = `{
                         "name": "tasks_file",
                         "in": "formData",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "rules — объяснения только по правилам, без LLM; по умолчанию llm",
+                        "name": "explain",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -52,13 +185,13 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "required tasks file is missing in multipart form",
+                        "description": "invalid region | invalid multipart form | tasks_file is missing in multipart form | invalid or missing columns in tasks CSV | invalid task row in CSV | tasks CSV contains no valid tasks",
                         "schema": {
                             "$ref": "#/definitions/errors.HttpErrorResponse"
                         }
                     },
                     "404": {
-                        "description": "address not found",
+                        "description": "region not found: no engineers file for region",
                         "schema": {
                             "$ref": "#/definitions/errors.HttpErrorResponse"
                         }
@@ -70,7 +203,13 @@ const docTemplate = `{
                         }
                     },
                     "502": {
-                        "description": "external service is unavailable",
+                        "description": "ml service is unavailable | geocoding service is unavailable | invalid response from external service",
+                        "schema": {
+                            "$ref": "#/definitions/errors.HttpErrorResponse"
+                        }
+                    },
+                    "504": {
+                        "description": "ml service timed out | geocoding service timed out",
                         "schema": {
                             "$ref": "#/definitions/errors.HttpErrorResponse"
                         }
@@ -107,6 +246,12 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/dto.ReplanRequest"
                         }
+                    },
+                    {
+                        "type": "string",
+                        "description": "rules — объяснения только по правилам, без LLM; по умолчанию llm",
+                        "name": "explain",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -117,13 +262,19 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "invalid request data",
+                        "description": "invalid region | invalid request data",
                         "schema": {
                             "$ref": "#/definitions/errors.HttpErrorResponse"
                         }
                     },
                     "404": {
-                        "description": "address not found",
+                        "description": "region not found: no engineers file for region | plan for region not found, call POST /plan first",
+                        "schema": {
+                            "$ref": "#/definitions/errors.HttpErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "cached plan references unknown engineer, rebuild it with POST /plan",
                         "schema": {
                             "$ref": "#/definitions/errors.HttpErrorResponse"
                         }
@@ -135,7 +286,13 @@ const docTemplate = `{
                         }
                     },
                     "502": {
-                        "description": "external service is unavailable",
+                        "description": "ml service is unavailable | geocoding service is unavailable | invalid response from external service",
+                        "schema": {
+                            "$ref": "#/definitions/errors.HttpErrorResponse"
+                        }
+                    },
+                    "504": {
+                        "description": "ml service timed out | geocoding service timed out",
                         "schema": {
                             "$ref": "#/definitions/errors.HttpErrorResponse"
                         }
@@ -175,14 +332,84 @@ const docTemplate = `{
                 "start_min": {
                     "type": "integer"
                 },
+                "task": {
+                    "$ref": "#/definitions/entities.Task"
+                },
                 "task_id": {
                     "type": "integer"
+                }
+            }
+        },
+        "dto.EngineerView": {
+            "type": "object",
+            "properties": {
+                "depot_address": {
+                    "type": "string"
                 },
-                "tw_end": {
+                "depot_lat": {
+                    "type": "number"
+                },
+                "depot_lon": {
+                    "type": "number"
+                },
+                "distance_km": {
+                    "type": "number"
+                },
+                "equipment": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entities.Equipment"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "load_percent": {
+                    "type": "number"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "service_time_min": {
                     "type": "integer"
                 },
-                "tw_start": {
+                "shift_end": {
                     "type": "integer"
+                },
+                "shift_start": {
+                    "type": "integer"
+                },
+                "skills": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entities.Skill"
+                    }
+                },
+                "task_count": {
+                    "type": "integer"
+                },
+                "task_ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "transport": {
+                    "type": "string"
+                },
+                "travel_time_min": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.HealthResponse": {
+            "type": "object",
+            "properties": {
+                "ml": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
                 }
             }
         },
@@ -228,8 +455,40 @@ const docTemplate = `{
                 "total_tasks": {
                     "type": "integer"
                 },
+                "total_time_min": {
+                    "type": "integer"
+                },
+                "total_travel_min": {
+                    "type": "integer"
+                },
                 "unassigned": {
                     "type": "integer"
+                }
+            }
+        },
+        "dto.PlanChange": {
+            "type": "object",
+            "properties": {
+                "delta_min": {
+                    "type": "integer"
+                },
+                "from_engineer_id": {
+                    "type": "string"
+                },
+                "new_start_min": {
+                    "type": "integer"
+                },
+                "old_start_min": {
+                    "type": "integer"
+                },
+                "task_id": {
+                    "type": "integer"
+                },
+                "to_engineer_id": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
                 }
             }
         },
@@ -244,6 +503,12 @@ const docTemplate = `{
                 },
                 "baseline_metrics": {
                     "$ref": "#/definitions/dto.Metrics"
+                },
+                "changes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.PlanChange"
+                    }
                 },
                 "ml_metrics": {
                     "$ref": "#/definitions/dto.Metrics"
@@ -313,6 +578,9 @@ const docTemplate = `{
                 },
                 "reason": {
                     "type": "string"
+                },
+                "task": {
+                    "$ref": "#/definitions/entities.Task"
                 },
                 "task_id": {
                     "type": "integer"
@@ -409,6 +677,9 @@ const docTemplate = `{
                 "error"
             ],
             "properties": {
+                "details": {
+                    "type": "string"
+                },
                 "error": {
                     "type": "string"
                 }

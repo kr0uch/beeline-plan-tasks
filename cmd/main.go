@@ -11,6 +11,7 @@ import (
 	"github.com/kr0uch/beeline-plan-tasks/docs"
 	"github.com/kr0uch/beeline-plan-tasks/internal/config"
 	"github.com/kr0uch/beeline-plan-tasks/internal/core/repository"
+	"github.com/kr0uch/beeline-plan-tasks/internal/core/service"
 	"github.com/kr0uch/beeline-plan-tasks/internal/transport/api/servers"
 	"github.com/kr0uch/beeline-plan-tasks/pkg/logger"
 )
@@ -40,9 +41,10 @@ func main() {
 	taskRepo := repository.NewTaskRepository()
 	mlRepo := repository.NewMLRepository(
 		&http.Client{
-			Timeout: 30 * time.Second,
+			Timeout: time.Duration(cfg.MLTimeLimitSec+20) * time.Second,
 		},
 		cfg.MLServiceURL,
+		cfg.MLTimeLimitSec,
 	)
 	geoRepo := repository.NewGeoRepository(
 		&http.Client{
@@ -52,22 +54,26 @@ func main() {
 	)
 	groqClient := repository.NewGroqClient(
 		&http.Client{
-			Timeout: 15 * time.Second,
+			Timeout: 10 * time.Second,
 		},
 		cfg.GroqModel,
 		cfg.GroqApiKey,
 	)
 	cacheRepo := repository.NewCacheRepository(cfg.CacheDataDir)
 
-	server := servers.NewServer(
-		cfg.ServerConfig,
-		zapLogger,
+	planService := service.NewPlanService(
 		engineerRepo,
 		taskRepo,
 		mlRepo,
 		geoRepo,
 		groqClient,
 		cacheRepo,
+	)
+
+	server := servers.NewServer(
+		cfg.ServerConfig,
+		zapLogger,
+		planService,
 	)
 
 	graceChan := make(chan os.Signal, 1)

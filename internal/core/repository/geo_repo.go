@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"math"
 	"net/http"
 	"net/url"
@@ -20,27 +19,33 @@ import (
 )
 
 const (
+	geoapifyBaseURL = "https://api.geoapify.com/v1"
+	routingMode     = "drive"
+
 	earthRadiusKm    = 6371.0
 	roadDetourFactor = 1.3
 	defaultSpeedKmH  = 30.0
+
+	batchPollInterval = 500 * time.Millisecond
+	batchPollTimeout  = 60 * time.Second
+
+	minConfidence            = 0.5
+	minConfidenceStreetLevel = 0.7
 )
 
-type GeoRepository interface {
-	GetDistanceAndTravelTime(
-		ctx context.Context,
-		request *dto.GetDistanceAndTravelTimeRequest,
-	) (*dto.GetDistanceAndTravelTimeResponse, error)
-	GetDistanceAndTravelTimeHaversine(
-		ctx context.Context,
-		request *dto.GetDistanceAndTravelTimeRequest,
-	) (*dto.GetDistanceAndTravelTimeResponse, error)
-	BatchGetGeoDataByAddresses(
-		ctx context.Context,
-		addresses []string,
-	) (dto.BatchGeoDataByAddressResponse, error)
-}
+var (
+	addressMarkers = `ул|пр-кт|пер|б-р|проезд|пр-зд|ш|наб`
 
-type geoRepo struct {
+	reHouse        = regexp.MustCompile(`(?i)(?:^|\s|,)\s*(?:д\.|д\s)\s*(.*)$`)
+	reKorpus       = regexp.MustCompile(`(?i)^([0-9А-Яа-яЁёA-Za-z\/\-]+?)\s*(?:,)?\s*(?:к|корп|корпус)\.?\s*(\d+)`)
+	reStreet       = regexp.MustCompile(`(?i)((?:` + addressMarkers + `)\.?[ \t]*[А-Яа-яЁёA-Za-z0-9\-]+(?:[ \t]+[А-Яа-яЁёA-Za-z0-9\-]+)*|[А-Яа-яЁёA-Za-z0-9\-]+(?:[ \t]+[А-Яа-яЁёA-Za-z0-9\-]+)*[ \t]+(?:` + addressMarkers + `)\.?)`)
+	reStreetPrefix = regexp.MustCompile(`(?i)^(` + addressMarkers + `)\.?\s*`)
+	reStreetSuffix = regexp.MustCompile(`(?i)\s+(` + addressMarkers + `)\.?$`)
+	reCityExplicit = regexp.MustCompile(`(?i)(?:г\.\s*город\s+|г\.\s*|город\s+|г\s+)([А-Яа-яЁё\-]+(?:\s+[А-Яа-яЁё\-]+)*)`)
+	reCityName     = regexp.MustCompile(`^[А-Яа-яЁё\s\-]+$`)
+)
+
+type GeoRepo struct {
 	client  *http.Client
 	baseURL string
 	apiKey  string
@@ -49,10 +54,10 @@ type geoRepo struct {
 func NewGeoRepository(
 	client *http.Client,
 	apiKey string,
-) GeoRepository {
-	return &geoRepo{
+) *GeoRepo {
+	return &GeoRepo{
 		client:  client,
-		baseURL: "https://api.geoapify.com/v1",
+		baseURL: geoapifyBaseURL,
 		apiKey:  apiKey,
 	}
 }
@@ -71,20 +76,18 @@ func CalculateHaversine(lat1, lon1, lat2, lon2 float64, speedKmH float64) (float
 		math.Cos(radLat1)*math.Cos(radLat2)*math.Sin(dLon/2)*math.Sin(dLon/2)
 	c := 2 * math.Atan2(math.Sqrt(a), math.Sqrt(1-a))
 
-	directDistance := earthRadiusKm * c
-
-	roadDistance := directDistance * roadDetourFactor
+	roadDistance := earthRadiusKm * c * roadDetourFactor
 
 	if speedKmH <= 0 {
 		speedKmH = defaultSpeedKmH
 	}
 
-	travelTimeMin := (roadDistance / speedKmH) * 60.0
+	travelTimeMin := roadDistance / speedKmH * 60.0
 
-	return math.Round(roadDistance*100) / 100, int(math.Round(travelTimeMin))
+	return roundKm(roadDistance), int(math.Round(travelTimeMin))
 }
 
-func (r *geoRepo) GetDistanceAndTravelTimeHaversine(
+func (r *GeoRepo) GetDistanceAndTravelTimeHaversine(
 	ctx context.Context,
 	request *dto.GetDistanceAndTravelTimeRequest,
 ) (*dto.GetDistanceAndTravelTimeResponse, error) {
@@ -102,7 +105,73 @@ func (r *geoRepo) GetDistanceAndTravelTimeHaversine(
 	}, nil
 }
 
-func (r *geoRepo) BatchGetGeoDataByAddresses(
+func (r *GeoRepo) GetDistanceAndTravelTime(
+	ctx context.Context,
+	request *dto.GetDistanceAndTravelTimeRequest,
+) (*dto.GetDistanceAndTravelTimeResponse, error) {
+
+	if request.CurrentLat == request.TargetLat && request.CurrentLon == request.TargetLon {
+		return &dto.GetDistanceAndTravelTimeResponse{}, nil
+	}
+
+	result, err := r.fetchRoute(ctx, request)
+	if err != nil {
+		return r.GetDistanceAndTravelTimeHaversine(ctx, request)
+	}
+
+	return &dto.GetDistanceAndTravelTimeResponse{
+		Distance: result.Distance,
+		Time:     result.Time,
+	}, nil
+}
+
+func (r *GeoRepo) fetchRoute(
+	ctx context.Context,
+	request *dto.GetDistanceAndTravelTimeRequest,
+) (*dto.RoutingData, error) {
+
+	params := url.Values{}
+	params.Add("apiKey", r.apiKey)
+	params.Add("waypoints", fmt.Sprintf(
+		"%f,%f|%f,%f",
+		request.CurrentLat, request.CurrentLon,
+		request.TargetLat, request.TargetLon,
+	))
+	params.Add("format", "json")
+	params.Add("mode", routingMode)
+
+	httpRequest, err := http.NewRequestWithContext(ctx, http.MethodGet, r.baseURL+"/routing?"+params.Encode(), nil)
+	if err != nil {
+		return nil, errors.ErrCreateRequest(err.Error())
+	}
+
+	response, err := r.client.Do(httpRequest)
+	if err != nil {
+		return nil, geocoderError(err)
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode != http.StatusOK {
+		return nil, errors.ErrGeocoderService(response.Status)
+	}
+
+	var routing dto.RoutingResponse
+	if err = json.NewDecoder(response.Body).Decode(&routing); err != nil {
+		return nil, errors.ErrInvalidResponse(err.Error())
+	}
+	if len(routing.Results) == 0 {
+		return nil, errors.ErrInvalidResponse("len(results) is zero")
+	}
+
+	item := routing.Results[0]
+
+	return &dto.RoutingData{
+		Distance: roundKm(item.Distance / 1000),
+		Time:     int(math.Round(item.Time / 60)),
+	}, nil
+}
+
+func (r *GeoRepo) BatchGetGeoDataByAddresses(
 	ctx context.Context,
 	addresses []string,
 ) (dto.BatchGeoDataByAddressResponse, error) {
@@ -111,175 +180,159 @@ func (r *geoRepo) BatchGetGeoDataByAddresses(
 		return make(dto.BatchGeoDataByAddressResponse), nil
 	}
 
-	formattedAddresses := make([]string, len(addresses))
-	addressMap := make(map[int]string)
-
+	formatted := make([]string, len(addresses))
 	for i, rawAddr := range addresses {
-		parsed := r.parseAddress(rawAddr)
-		formattedAddresses[i] = fmt.Sprintf("%s, %s, %s", parsed.City, parsed.Street, parsed.HouseNumber)
-		addressMap[i] = rawAddr
+		parsed := parseAddress(rawAddr)
+		formatted[i] = fmt.Sprintf("%s, %s, %s", parsed.City, parsed.Street, parsed.HouseNumber)
 	}
 
-	bodyBytes, err := json.Marshal(formattedAddresses)
+	bodyBytes, err := json.Marshal(formatted)
 	if err != nil {
-		return nil, errors.ErrInvalidRequest
+		return nil, errors.ErrMarshalPayload(err.Error())
 	}
 
 	URLPath := fmt.Sprintf("%s/batch/geocode/search?apiKey=%s", r.baseURL, r.apiKey)
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, URLPath, bytes.NewBuffer(bodyBytes))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, URLPath, bytes.NewReader(bodyBytes))
 	if err != nil {
-		return nil, errors.ErrInvalidRequest
+		return nil, errors.ErrCreateRequest(err.Error())
 	}
 	req.Header.Set("Content-Type", "application/json")
 
 	resp, err := r.client.Do(req)
 	if err != nil {
-		return nil, errors.ErrExternalService(err.Error())
+		return nil, geocoderError(err)
 	}
 	defer resp.Body.Close()
 
 	var responseBody []byte
-
-	if resp.StatusCode == http.StatusOK {
+	switch resp.StatusCode {
+	case http.StatusOK:
 		responseBody, err = io.ReadAll(resp.Body)
 		if err != nil {
-			return nil, errors.ErrExternalService(err.Error())
+			return nil, geocoderError(err)
 		}
-	} else if resp.StatusCode == http.StatusAccepted {
-		var jobResp struct {
+	case http.StatusAccepted:
+		var job struct {
 			ID string `json:"id"`
 		}
-		if err = json.NewDecoder(resp.Body).Decode(&jobResp); err != nil {
-			return nil, errors.ErrExternalService(err.Error())
+		if err = json.NewDecoder(resp.Body).Decode(&job); err != nil {
+			return nil, errors.ErrInvalidResponse(err.Error())
 		}
 
-		responseBody, err = r.pollBatchResult(ctx, jobResp.ID)
+		responseBody, err = r.pollBatchResult(ctx, job.ID)
 		if err != nil {
 			return nil, err
 		}
-	} else {
-		return nil, errors.ErrExternalService(resp.Status)
+	default:
+		return nil, errors.ErrGeocoderService(resp.Status)
 	}
 
-	return r.parseBatchGeocodeResponse(responseBody, addressMap)
+	return parseBatchGeocodeResponse(responseBody, addresses)
 }
 
-func (r *geoRepo) pollBatchResult(ctx context.Context, jobID string) ([]byte, error) {
+func (r *GeoRepo) pollBatchResult(ctx context.Context, jobID string) ([]byte, error) {
+	ctx, cancel := context.WithTimeout(ctx, batchPollTimeout)
+	defer cancel()
+
 	pollURL := fmt.Sprintf("%s/batch/geocode/search?id=%s&apiKey=%s", r.baseURL, jobID, r.apiKey)
 
-	ticker := time.NewTicker(500 * time.Millisecond)
+	ticker := time.NewTicker(batchPollInterval)
 	defer ticker.Stop()
 
 	for {
 		select {
 		case <-ctx.Done():
-			return nil, ctx.Err()
+			return nil, errors.ErrGeocoderTimeout("batch geocoding: " + ctx.Err().Error())
 		case <-ticker.C:
-			req, err := http.NewRequestWithContext(ctx, http.MethodGet, pollURL, nil)
-			if err != nil {
-				return nil, err
-			}
+		}
 
-			resp, err := r.client.Do(req)
-			if err != nil {
-				return nil, errors.ErrExternalService(err.Error())
-			}
-
-			if resp.StatusCode == http.StatusOK {
-				defer resp.Body.Close()
-				return io.ReadAll(resp.Body)
-			}
-			resp.Body.Close()
+		body, done, err := r.fetchBatchResult(ctx, pollURL)
+		if err != nil {
+			return nil, err
+		}
+		if done {
+			return body, nil
 		}
 	}
 }
 
-func (r *geoRepo) parseBatchGeocodeResponse(
+func (r *GeoRepo) fetchBatchResult(ctx context.Context, pollURL string) ([]byte, bool, error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, pollURL, nil)
+	if err != nil {
+		return nil, false, errors.ErrCreateRequest(err.Error())
+	}
+
+	resp, err := r.client.Do(req)
+	if err != nil {
+		return nil, false, geocoderError(err)
+	}
+	defer resp.Body.Close()
+
+	switch resp.StatusCode {
+	case http.StatusOK:
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return nil, false, geocoderError(err)
+		}
+		return body, true, nil
+	case http.StatusAccepted:
+		return nil, false, nil
+	default:
+		return nil, false, errors.ErrGeocoderService(resp.Status)
+	}
+}
+
+func parseBatchGeocodeResponse(
 	jsonData []byte,
-	addressMap map[int]string,
+	addresses []string,
 ) (dto.BatchGeoDataByAddressResponse, error) {
 
 	var items []dto.BatchGeocodeItem
 	if err := json.Unmarshal(jsonData, &items); err != nil {
-		return nil, errors.ErrDecodeResponse(err.Error())
+		return nil, errors.ErrInvalidResponse(err.Error())
 	}
 
-	resMap := make(dto.BatchGeoDataByAddressResponse, len(items))
-
+	result := make(dto.BatchGeoDataByAddressResponse, len(items))
 	for i, item := range items {
-		rawAddr, ok := addressMap[i]
-		if !ok || rawAddr == "" {
+		if i >= len(addresses) || addresses[i] == "" || !isConfidentMatch(item) {
 			continue
 		}
-
-		isCorrectType := item.ResultType == "street" || item.ResultType == "building"
-		hasStreetConfidence := item.Rank.ConfidenceStreetLevel >= 0.7
-		hasValidConfidence := item.Rank.Confidence >= 0.5
-
-		if isCorrectType && hasStreetConfidence && hasValidConfidence && (item.Lat != 0 || item.Lon != 0) {
-			resMap[rawAddr] = entities.GeoData{
-				Lat: item.Lat,
-				Lon: item.Lon,
-			}
-		}
+		result[addresses[i]] = entities.GeoData{Lat: item.Lat, Lon: item.Lon}
 	}
 
-	return resMap, nil
+	return result, nil
 }
 
-func (r *geoRepo) parseAddress(
-	address string,
-) *dto.Address {
+func isConfidentMatch(item dto.BatchGeocodeItem) bool {
+	isPrecise := item.ResultType == "street" || item.ResultType == "building"
+	return isPrecise &&
+		item.Rank.ConfidenceStreetLevel >= minConfidenceStreetLevel &&
+		item.Rank.Confidence >= minConfidence &&
+		(item.Lat != 0 || item.Lon != 0)
+}
 
+func parseAddress(address string) *dto.Address {
 	addr := &dto.Address{}
 	remaining := address
 
-	reHouse := regexp.MustCompile(`(?i)(?:^|\s|,)\s*(?:д\.|д\s)\s*(.*)$`)
 	if match := reHouse.FindStringSubmatch(remaining); len(match) > 1 {
 		house := strings.TrimSpace(match[1])
-
-		reKorpus := regexp.MustCompile(`(?i)^([0-9А-Яа-яЁёA-Za-z\/\-]+?)\s*(?:,)?\s*(?:к|корп|корпус)\.?\s*(\d+)`)
 		addr.HouseNumber = reKorpus.ReplaceAllString(house, "$1 к$2")
-
 		remaining = strings.Replace(remaining, match[0], "", 1)
 	}
-
-	markers := `ул|пр-кт|пер|б-р|проезд|пр-зд|ш|наб`
-	reStreet := regexp.MustCompile(`(?i)((?:` + markers + `)\.?[ \t]*[А-Яа-яЁёA-Za-z0-9\-]+(?:[ \t]+[А-Яа-яЁёA-Za-z0-9\-]+)*|[А-Яа-яЁёA-Za-z0-9\-]+(?:[ \t]+[А-Яа-яЁёA-Za-z0-9\-]+)*[ \t]+(?:` + markers + `)\.?)`)
 
 	if match := reStreet.FindStringSubmatch(remaining); len(match) > 1 {
-		fullStreet := strings.TrimSpace(match[1])
+		street := strings.TrimSpace(match[1])
 		remaining = strings.Replace(remaining, match[0], "", 1)
 
-		rePrefix := regexp.MustCompile(`(?i)^(` + markers + `)\.?\s*`)
-		reSuffix := regexp.MustCompile(`(?i)\s+(` + markers + `)\.?$`)
-
-		cleanStreet := rePrefix.ReplaceAllString(fullStreet, "")
-		cleanStreet = reSuffix.ReplaceAllString(cleanStreet, "")
-
-		addr.Street = cleanStreet
+		street = reStreetPrefix.ReplaceAllString(street, "")
+		addr.Street = reStreetSuffix.ReplaceAllString(street, "")
 	}
 
-	reCityExplicit := regexp.MustCompile(`(?i)(?:г\.\s*город\s+|г\.\s*|город\s+|г\s+)([А-Яа-яЁё\-]+(?:\s+[А-Яа-яЁё\-]+)*)`)
 	if match := reCityExplicit.FindStringSubmatch(remaining); len(match) > 1 {
 		addr.City = strings.TrimSpace(match[1])
 	} else {
-		parts := strings.Split(remaining, ",")
-		for _, p := range parts {
-			cleanP := strings.TrimSpace(p)
-			if cleanP == "" {
-				continue
-			}
-			lowerP := strings.ToLower(cleanP)
-			if strings.Contains(lowerP, "обл") || strings.Contains(lowerP, "мо") || strings.Contains(lowerP, "пгт") {
-				continue
-			}
-			matched, _ := regexp.MatchString(`^[А-Яа-яЁё\s\-]+$`, cleanP)
-			if matched {
-				addr.City = cleanP
-				break
-			}
-		}
+		addr.City = guessCity(remaining)
 	}
 
 	addr.City = strings.TrimRight(addr.City, " ,.")
@@ -289,98 +342,45 @@ func (r *geoRepo) parseAddress(
 	return addr
 }
 
-func (r *geoRepo) parseGeocodeResponse(
-	jsonData []byte,
-) (*entities.GeoData, error) {
+func guessCity(address string) string {
+	for _, part := range strings.Split(address, ",") {
+		part = strings.TrimSpace(part)
+		if part == "" {
+			continue
+		}
 
-	var reponse dto.GeocodeResponse
-	if err := json.Unmarshal(jsonData, &reponse); err != nil {
-		return nil, errors.ErrDecodeResponse(err.Error())
+		if isRegionPart(part) {
+			continue
+		}
+
+		if reCityName.MatchString(part) {
+			return part
+		}
 	}
-
-	if len(reponse.Results) == 0 {
-		return nil, errors.ErrInvalidResponse("len(results) is zero")
-	}
-
-	item := reponse.Results[0]
-
-	isCorrectType := item.ResultType == "street" || item.ResultType == "building"
-	hasStreetConfidence := item.Rank.ConfidenceStreetLevel >= 0.7
-	hasValidConfidence := item.Rank.Confidence >= 0.5
-
-	if !(isCorrectType && hasStreetConfidence && hasValidConfidence) {
-		return nil, errors.ErrAddressNotFound
-	}
-
-	return &entities.GeoData{
-		Lat: item.Lat,
-		Lon: item.Lon,
-	}, nil
+	return ""
 }
 
-func (r *geoRepo) GetDistanceAndTravelTime(
-	ctx context.Context,
-	request *dto.GetDistanceAndTravelTimeRequest,
-) (*dto.GetDistanceAndTravelTimeResponse, error) {
-
-	httpRequest, err := http.NewRequestWithContext(ctx, http.MethodGet, r.baseURL+"/routing", nil)
-	if err != nil {
-		return nil, errors.ErrInvalidRequest
+func isRegionPart(part string) bool {
+	for _, word := range strings.Fields(strings.ToLower(part)) {
+		word = strings.TrimRight(word, ".")
+		if word == "мо" || word == "пгт" || strings.HasPrefix(word, "обл") {
+			return true
+		}
 	}
-
-	waypoints := fmt.Sprintf("%f,%f|%f,%f", request.CurrentLat, request.CurrentLon, request.TargetLat, request.TargetLon)
-
-	params := url.Values{}
-	params.Add("apiKey", r.apiKey)
-	params.Add("waypoints", waypoints)
-	params.Add("format", "json")
-	params.Add("mode", "drive") //TODO: по транспорту
-
-	httpRequest.URL.RawQuery = params.Encode()
-
-	response, err := r.client.Do(httpRequest)
-	if err != nil {
-		return r.GetDistanceAndTravelTimeHaversine(ctx, request)
-	}
-	defer response.Body.Close()
-
-	if response.StatusCode != http.StatusOK {
-		return r.GetDistanceAndTravelTimeHaversine(ctx, request)
-	}
-
-	body, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		return nil, errors.ErrExternalService(err.Error())
-	}
-
-	result, err := r.parseRoutingResponse(body)
-	if err != nil {
-		return nil, err
-	}
-
-	return &dto.GetDistanceAndTravelTimeResponse{
-		Distance: result.Distance,
-		Time:     result.Time,
-	}, nil
+	return false
 }
 
-func (r *geoRepo) parseRoutingResponse(
-	jsonData []byte,
-) (*dto.RoutingData, error) {
+func roundKm(km float64) float64 {
+	return math.Round(km*100) / 100
+}
 
-	var reponse dto.RoutingResponse
-	if err := json.Unmarshal(jsonData, &reponse); err != nil {
-		return nil, errors.ErrDecodeResponse(err.Error())
+// geocoderError отбрасывает URL из ошибки клиента: в нём apiKey.
+func geocoderError(err error) error {
+	if urlErr, ok := err.(*url.Error); ok {
+		err = urlErr.Err
 	}
-
-	if len(reponse.Results) == 0 {
-		return nil, errors.ErrInvalidResponse("len(results) is zero")
+	if errors.IsTimeout(err) {
+		return errors.ErrGeocoderTimeout(err.Error())
 	}
-
-	item := reponse.Results[0]
-
-	return &dto.RoutingData{
-		Distance: math.Round(item.Distance / 1000),
-		Time:     int(math.Round(item.Time / 60)),
-	}, nil
+	return errors.ErrGeocoderService(err.Error())
 }

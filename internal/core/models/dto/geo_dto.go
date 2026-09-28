@@ -4,17 +4,6 @@ import "github.com/kr0uch/beeline-plan-tasks/internal/core/models/entities"
 
 type BatchGeoDataByAddressResponse map[string]entities.GeoData
 
-type GeocodeResponse struct {
-	Results []GeocodeResult `json:"results"`
-}
-
-type GeocodeResult struct {
-	Lon        float64 `json:"lon"`
-	Lat        float64 `json:"lat"`
-	ResultType string  `json:"result_type"`
-	Rank       Rank    `json:"rank"`
-}
-
 type Rank struct {
 	Confidence              float64 `json:"confidence"`
 	ConfidenceCityLevel     float64 `json:"confidence_city_level"`

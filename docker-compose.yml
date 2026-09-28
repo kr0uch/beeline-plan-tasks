@@ -7,7 +7,7 @@ services:
     container_name: beeline_server
     restart: unless-stopped
     volumes:
-      - .yaml:/.yaml
+      - .yaml:/app/.yaml
       - ./data:/app/data
     networks:
       - global-app-network
@@ -27,7 +27,9 @@ services:
     networks:
       - global-app-network
     depends_on:
-      - beeline_server
+      beeline_server:
+        condition: service_healthy
+
 
 networks:
   global-app-network:
