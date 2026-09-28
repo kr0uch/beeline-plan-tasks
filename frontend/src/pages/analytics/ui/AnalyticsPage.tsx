@@ -107,9 +107,9 @@ function HourChart({ data, max }: { data: HourPoint[]; max: number }) {
 }
 
 function crewSplit(c: Crew) {
-  const work = c.stops.reduce((s, x) => s + x.task.service_time, 0)
+  const work = c.serviceMin ?? c.stops.reduce((s, x) => s + x.task.service_time, 0)
   const wait = c.stops.reduce((s, x) => s + (x.assignment ? Math.max(0, x.assignment.start_min - x.assignment.arrival_min) : 0), 0)
-  const travel = Math.max(0, c.timeMin - work - wait)
+  const travel = c.travelMin ?? Math.max(0, c.timeMin - work - wait)
   return { work, travel, wait }
 }
 

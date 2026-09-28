@@ -1,3 +1,5 @@
+import type { Equipment, Skill } from '@/entities/task'
+
 
 export type Task = {
   id: number
@@ -6,8 +8,8 @@ export type Task = {
   lat: number
   lon: number
   priority: string
-  required_equipment: string[]
-  required_skills: string[]
+  required_equipment: Equipment[]
+  required_skills: Skill[]
   service_time: number
   tw_start: number
   tw_end: number
@@ -42,6 +44,8 @@ export type Route = {
   transport: string
   distance_km: number
   time_min: number
+  service_time_min?: number
+  travel_time_min?: number
   tasks: Task[]
 }
 
@@ -68,4 +72,9 @@ export type PlanResponse = {
   routes: Route[]
   ml_metrics: Metrics
   baseline_metrics: Metrics
+}
+
+export type ReplanRequest = {
+  current_time_min: number
+  new_task: Task
 }

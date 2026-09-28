@@ -1,11 +1,13 @@
 import { useMemo, useState, type ReactNode } from 'react'
 import { useNavigate } from 'react-router'
 import { transportIcon } from '@/entities/plan'
+import { requirementList } from '@/entities/task'
 import { PlanUploadForm, usePlan } from '@/features/load-plan'
 import { cn, formatClock, formatPlanTime, plural, toDayMin, useNow } from '@/shared/lib'
 import { Badge, Icon } from '@/shared/ui'
 import { buildScenario, type TimelineItem } from '../lib/scenario'
 import { MiniRouteMap } from './MiniRouteMap'
+import { NewTaskForm } from './NewTaskForm'
 
 function Timeline({ title, items }: { title: string; items: TimelineItem[] }) {
   return (
@@ -76,11 +78,27 @@ function CrewCard({ tone, badge, title, subtitle, match, children }: { tone: 'ma
 }
 
 export function ReplanPage() {
-  const { plan, view } = usePlan()
+  const { plan, view, previous, replanTask, replan, status, error } = usePlan()
+  const [showForm, setShowForm] = useState(false)
   const navigate = useNavigate()
   const now = useNow()
   const [applied, setApplied] = useState(false)
-  const scenario = useMemo(() => (view ? buildScenario(view) : null), [view])
+  const scenario = useMemo(
+    () => (view ? buildScenario(view, replanTask && previous ? { taskId: replanTask.id, previous: previous.view } : undefined) : null),
+    [view, replanTask, previous],
+  )
+  const nextId = view ? Math.max(0, ...view.tasks.keys(), ...view.unassigned.map((u) => u.task_id)) + 1 : 1
+  const form = (onCancel?: () => void) => (
+    <NewTaskForm
+      nextId={nextId}
+      busy={status === 'loading'}
+      error={status === 'error' ? error : null}
+      onCancel={onCancel}
+      onSubmit={async (task) => {
+        if (await replan(task)) setShowForm(false)
+      }}
+    />
+  )
 
   if (!plan || !view) {
     return (
@@ -92,9 +110,10 @@ export function ReplanPage() {
 
   if (!scenario) {
     return (
-      <div className="flex min-h-full flex-col items-center justify-center gap-2 p-6 text-center text-body-md text-text-secondary">
+      <div className="flex min-h-full flex-col items-center justify-center gap-4 p-6 text-center text-body-md text-text-secondary">
         <Icon name="task_alt" size={36} className="text-signal-success" />
-        В текущем плане нет аварий и критичных заявок — перепланирование не требуется.
+        В текущем плане нет аварий и критичных заявок. Добавьте новую заявку, чтобы встроить её в план.
+        <div className="w-full max-w-4xl text-left">{form()}</div>
       </div>
     )
   }
@@ -104,7 +123,7 @@ export function ReplanPage() {
   const base = plan.baseline_metrics
   const slaLeft = toDayMin(assignment.tw_end) - now
   const shifted = scenario.shiftedIds.length
-  const affected = 1
+  const affected = scenario.affectedCrewIds.length
   const rate = (m: typeof ml) => Math.round((m.assigned_rate <= 1 ? m.assigned_rate * 100 : m.assigned_rate) * 10) / 10
   const backupLate = backup ? backup.arrivalMin - assignment.arrival_min : 0
 
@@ -146,6 +165,20 @@ export function ReplanPage() {
       </section>
 
       <div className="flex flex-col gap-5 p-4 pb-28">
+        {showForm ? (
+          form(() => setShowForm(false))
+        ) : (
+          <div className="flex items-center gap-3 rounded-lg border border-dashed border-border bg-bg-surface px-4 py-3">
+            <Icon name="add_alert" className="text-signal-danger" />
+            <span className="mr-auto text-body-sm text-text-secondary">
+              {scenario.real ? `План пересчитан с новой заявкой #${scenario.emergency.id}` :'Сценарий построен по текущему плану. Добавьте новую заявку, чтобы пересчитать маршруты на бэкенде.'}
+            </span>
+            <button type="button" onClick={() => setShowForm(true)} className="flex h-8 items-center gap-1.5 rounded-lg bg-signal-danger px-3 text-title-sm text-white hover:opacity-90">
+              <Icon name="add" />
+              Новая заявка
+            </button>
+          </div>
+        )}
         <section className="grid grid-cols-2 gap-4">
           <div className="overflow-hidden rounded-lg border border-border bg-bg-surface shadow-sm">
             <div className="flex items-center justify-between p-3">
@@ -153,7 +186,7 @@ export function ReplanPage() {
                 <Icon name="history" />
                 План ДО поступления аварии
               </span>
-              <Badge className="bg-primary-soft text-primary">Базовая версия</Badge>
+              <Badge className="bg-primary-soft text-primary">{scenario.real ? 'Предыдущий расчёт' : 'Реконструкция'}</Badge>
             </div>
             <div style={{ height: 256 }}>
               <MiniRouteMap stops={scenario.beforeStops} color="#64748B" emergency={emergency} dashed />
@@ -257,7 +290,7 @@ export function ReplanPage() {
                 })}
               <div className="flex items-center gap-2 pt-1 text-label-md text-text-secondary">
                 <Icon name="construction" size={16} />
-                Требуется: {[...emergency.required_skills, ...emergency.required_equipment].join(', ') || 'без особых требований'}
+                Требуется: {requirementList([...emergency.required_skills, ...emergency.required_equipment]) || 'без особых требований'}
               </div>
             </CrewCard>
 

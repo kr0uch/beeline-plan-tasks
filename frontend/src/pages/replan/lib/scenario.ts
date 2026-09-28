@@ -28,6 +28,8 @@ export type Scenario = {
   extraKm: number
   reactionMin: number
   backup: BackupOption | null
+  affectedCrewIds: string[]
+  real: boolean
 }
 
 const ROAD_FACTOR = 1.35
@@ -57,14 +59,39 @@ function pickEmergency(view: PlanView): { crew: Crew; index: number } | null {
 }
 
 function skillMatch(task: Task, crew: Crew): number {
-  const need = [...task.required_skills, ...task.required_equipment]
+  const need: string[] = [...task.required_skills, ...task.required_equipment]
   if (!need.length) return 1
-  const has = new Set(crew.stops.flatMap((s) => [...s.task.required_skills, ...s.task.required_equipment]))
+  const has = new Set<string>(crew.stops.flatMap((s) => [...s.task.required_skills, ...s.task.required_equipment]))
   return need.filter((n) => has.has(n)).length / need.length
 }
 
-export function buildScenario(view: PlanView): Scenario | null {
-  const picked = pickEmergency(view)
+function findTask(view: PlanView, taskId: number): { crew: Crew; index: number } | null {
+  for (const crew of view.crews) {
+    const index = crew.stops.findIndex((s) => s.task.id === taskId)
+    if (index >= 0) return { crew, index }
+  }
+  return null
+}
+
+function timeline(stops: PlannedStop[], emergencyId: number, shifted: Set<number>): TimelineItem[] {
+  return stops.flatMap((s) =>
+    s.assignment
+      ? [
+          {
+            taskId: s.task.id,
+            start: s.assignment.start_min,
+            end: s.assignment.end_min,
+            emergency: s.task.id === emergencyId,
+            shifted: shifted.has(s.task.id),
+            late: s.assignment.late_min > 0,
+          },
+        ]
+      : [],
+  )
+}
+
+export function buildScenario(view: PlanView, replan?: { taskId: number; previous: PlanView }): Scenario | null {
+  const picked = replan ? findTask(view, replan.taskId) : pickEmergency(view)
   if (!picked) return null
   const { crew, index } = picked
   const stop = crew.stops[index]
@@ -115,7 +142,38 @@ export function buildScenario(view: PlanView): Scenario | null {
     })
     .sort((a, b) => b.skillMatch - a.skillMatch || a.arrivalMin - b.arrivalMin)[0] ?? null
 
+  if (replan) {
+    const prevCrew = replan.previous.crews.find((c) => c.id === crew.id)
+    const shifted = new Set<number>()
+    const affected = new Set<string>([crew.id])
+    for (const c of view.crews) {
+      for (const st of c.stops) {
+        const old = replan.previous.assignments.get(st.task.id)
+        if (st.assignment && old && (old.start_min !== st.assignment.start_min || old.engineer_id !== st.assignment.engineer_id)) {
+          shifted.add(st.task.id)
+          affected.add(c.id)
+        }
+      }
+    }
+    return {
+      emergency: stop.task,
+      assignment,
+      crew,
+      before: timeline(prevCrew?.stops ?? [], -1, new Set()),
+      after: timeline(crew.stops, stop.task.id, shifted),
+      beforeStops: prevCrew?.stops ?? [],
+      shiftedIds: [...shifted],
+      extraKm: Math.max(0, crew.distanceKm - (prevCrew?.distanceKm ?? crew.distanceKm)),
+      reactionMin: Math.max(0, assignment.arrival_min - assignment.tw_start),
+      backup,
+      affectedCrewIds: [...affected],
+      real: true,
+    }
+  }
+
   return {
+    affectedCrewIds: [crew.id],
+    real: false,
     emergency: stop.task,
     assignment,
     crew,

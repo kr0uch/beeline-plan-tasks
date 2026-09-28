@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { crewShortName, transportIcon, type Crew, type PlanView } from '@/entities/plan'
-import { getTaskKind, TASK_KIND_META, type TaskKind } from '@/entities/task'
+import { getTaskKind, requirementLabel, TASK_KIND_META, type TaskKind } from '@/entities/task'
 import { PlanUploadForm, usePlan } from '@/features/load-plan'
 import { cn, formatDuration, formatPlanTime, plural, toDayMin, useNow } from '@/shared/lib'
 import { Badge, Icon } from '@/shared/ui'
@@ -33,12 +33,12 @@ function crewState(c: Crew, now: number) {
 
 function buildMatrix(view: PlanView) {
   const tasks = view.crews.flatMap((c) => c.stops.map((s) => s.task))
-  const items = [...new Set(tasks.flatMap((t) => [...t.required_equipment, ...t.required_skills]))].slice(0, 8)
+  const items: string[] = [...new Set(tasks.flatMap((t) => [...t.required_equipment, ...t.required_skills]))].slice(0, 10)
   const kinds = (Object.keys(TASK_KIND_META) as TaskKind[]).filter((k) => tasks.some((t) => getTaskKind(t) === k))
   const rows = kinds.map((kind) => {
     const group = tasks.filter((t) => getTaskKind(t) === kind)
     const cells = items.map((item): Level => {
-      const n = group.filter((t) => t.required_equipment.includes(item) || t.required_skills.includes(item)).length
+      const n = group.filter((t) => (t.required_equipment as string[]).includes(item) || (t.required_skills as string[]).includes(item)).length
       return n === group.length ? 'required' : n > 0 ? 'preferred' : 'none'
     })
     return { kind, count: group.length, cells }
@@ -68,7 +68,7 @@ function CrewCard({ crew, now, onOpen }: { crew: Crew; now: number; onOpen: () =
             <span className="text-title-md">{crew.name}</span>
             <Badge className={state.tone}>{state.label}</Badge>
           </div>
-          <div className="truncate text-label-md text-text-muted">{skills.join(' • ') || 'Универсальный монтаж'}</div>
+          <div className="truncate text-label-md text-text-muted">{skills.map(requirementLabel).join(' • ') || 'Универсальный монтаж'}</div>
         </div>
       </div>
 
@@ -87,7 +87,7 @@ function CrewCard({ crew, now, onOpen }: { crew: Crew; now: number; onOpen: () =
             equipment.map((e) => (
               <span key={e} className="flex items-center gap-0.5 rounded bg-primary-soft px-1.5 py-0.5 text-label-sm text-primary">
                 <Icon name="check" size={12} />
-                {e}
+                {requirementLabel(e)}
               </span>
             ))
           ) : (
@@ -147,7 +147,7 @@ export function CrewsPage() {
   const crews = view.crews.filter(
     (c) =>
       (mode === 'all' || (mode === 'walk') === isWalk(c)) &&
-      (!skill || crewSkills(c).includes(skill)) &&
+      (!skill || (crewSkills(c) as string[]).includes(skill)) &&
       (!q || `${c.name} ${c.transport}`.toLowerCase().includes(q)),
   )
   const avgLoad = Math.round(view.crews.reduce((s, c) => s + c.loadPct, 0) / view.crews.length)
@@ -215,7 +215,7 @@ export function CrewsPage() {
                 onClick={() => setSkill(skill === s ? null : s)}
                 className={cn('rounded px-2 py-0.5', skill === s ? 'bg-primary text-white' : 'bg-primary-soft text-primary hover:bg-surface-high')}
               >
-                {s}
+                {requirementLabel(s)}
               </button>
             ))}
           </div>
@@ -277,7 +277,7 @@ export function CrewsPage() {
                 <th className="px-4 py-3">Тип производимых работ</th>
                 {matrix.items.map((item) => (
                   <th key={item} className="px-3 py-3 text-center">
-                    {item}
+                    {requirementLabel(item)}
                   </th>
                 ))}
               </tr>

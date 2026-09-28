@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { transportIcon, type Crew, type PlanView } from '@/entities/plan'
-import { getPriorityMeta, getTaskKind, TASK_KIND_META } from '@/entities/task'
+import { getPriorityMeta, getTaskKind, requirementList, TASK_KIND_META } from '@/entities/task'
 import { cn, formatDuration, formatPlanTime } from '@/shared/lib'
 import { Badge, Icon } from '@/shared/ui'
 
@@ -283,12 +283,12 @@ export function TaskInspector({
         <div className="mb-1 text-label-sm font-bold tracking-wider text-text-muted uppercase">Проверка условий алгоритма</div>
         <Check
           ok
-          label={`Квалификация: ${task.required_skills.join(', ') || 'не требуется'}`}
+          label={`Квалификация: ${requirementList(task.required_skills) || 'не требуется'}`}
           value={task.required_skills.length ? 'Да' : '—'}
         />
         <Check
           ok
-          label={`Оборудование: ${task.required_equipment.join(', ') || 'не требуется'}`}
+          label={`Оборудование: ${requirementList(task.required_equipment) || 'не требуется'}`}
           value={task.required_equipment.length ? 'В наличии' : '—'}
         />
         <Check ok={!late} label="Временное окно клиента" value={late ? `+${late} мин` : 'Соблюдено'} />

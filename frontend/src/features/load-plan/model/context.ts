@@ -1,5 +1,5 @@
 import { createContext, useContext } from 'react'
-import type { PlanResponse, PlanView } from '@/entities/plan'
+import type { PlanResponse, PlanView, Task } from '@/entities/plan'
 import type { Region } from '@/shared/config'
 
 export type PlanStatus = 'idle' | 'loading' | 'success' | 'error'
@@ -25,6 +25,8 @@ export type PlanState = {
   view: PlanView | null
   updatedAt: Date | null
   history: PlanRun[]
+  previous: { plan: PlanResponse; view: PlanView } | null
+  replanTask: Task | null
 }
 
 export type PlanActions = {
@@ -32,6 +34,7 @@ export type PlanActions = {
   submit: (file: File, region?: Region) => Promise<void>
   recalculate: () => Promise<void>
   loadDemo: () => void
+  replan: (task: Task) => Promise<boolean>
   reset: () => void
 }
 

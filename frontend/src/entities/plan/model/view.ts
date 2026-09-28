@@ -15,6 +15,8 @@ export type Crew = {
   transport: string
   distanceKm: number
   timeMin: number
+  travelMin: number | null
+  serviceMin: number | null
   loadPct: number
   load: CrewLoad
   lateCount: number
@@ -55,6 +57,8 @@ function buildCrew(route: Route, index: number, assignments: Map<number, Assigne
     transport: route.transport,
     distanceKm: route.distance_km,
     timeMin: route.time_min,
+    travelMin: route.travel_time_min ?? null,
+    serviceMin: route.service_time_min ?? null,
     loadPct,
     load: crewLoad(loadPct, stops.length),
     lateCount: late.length,

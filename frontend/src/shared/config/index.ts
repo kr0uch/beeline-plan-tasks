@@ -5,9 +5,9 @@ export const PLAN_TIME_ORIGIN_MIN = Number(import.meta.env.VITE_PLAN_TIME_ORIGIN
 export const SHIFT_DURATION_MIN = 480
 
 export const REGIONS = [
-  { value: 'vostok', label: 'Восток' },
-  { value: 'yugo-vostok', label: 'Юго-Восток' },
-  { value: 'yugo-centr', label: 'Юго-Центр' },
+  { value: 'east', label: 'Восток' },
+  { value: 'southeast', label: 'Юго-Восток' },
+  { value: 'southcenter', label: 'Юго-Центр' },
 ] as const
 
 export type Region = (typeof REGIONS)[number]['value']
