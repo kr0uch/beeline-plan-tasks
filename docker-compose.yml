@@ -11,6 +11,21 @@ services:
       - ./data:/app/data
     networks:
       - global-app-network
+    depends_on:
+      ml-solver:
+        condition: service_healthy
+
+  ml-solver:
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile.ml
+    image: hackathon-routes-ml-solver:latest
+    container_name: ml-solver
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+    networks:
+      - global-app-network
 
   nginx:
     build:
