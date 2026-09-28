@@ -63,13 +63,15 @@ export function PlanProvider({ children }: { children: ReactNode }) {
     try {
       const plan = await createPlan(target, file, controller.signal)
       applyPlan(plan, { isDemo: false, fileName: file.name, previous: null, replanTask: null })
+      return true
     } catch (e) {
-      if (controller.signal.aborted) return
+      if (controller.signal.aborted) return false
       setState((s) => ({
         ...s,
         status: 'error',
         error: e instanceof Error ? e.message : 'Не удалось построить план',
       }))
+      return false
     }
   }, [])
 
@@ -101,7 +103,10 @@ export function PlanProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const recalculate = useCallback(async () => {
-    if (lastFile.current) return submit(lastFile.current)
+    if (lastFile.current) {
+      await submit(lastFile.current)
+      return
+    }
     if (state.isDemo) loadDemo()
   }, [submit, loadDemo, state.isDemo])
 
