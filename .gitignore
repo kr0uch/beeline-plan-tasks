@@ -1,0 +1,28 @@
+# System
+*.log
+*.tmp
+
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# IDE
+.idea/
+*.iml
+*.iws
+.idea/workspace.xml
+.idea/shelf/
+.vscode/
+
+# Docker & Database
+data/
+
+# Other
+.yaml
+.env
+.env.local
+.env.*.local
+secrets.xml
+local.*

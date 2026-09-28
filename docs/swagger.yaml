@@ -1,0 +1,282 @@
+basePath: /api/v1
+definitions:
+  dto.AssignedTask:
+    properties:
+      arrival_min:
+        type: integer
+      end_min:
+        type: integer
+      engineer_id:
+        type: string
+      engineer_name:
+        type: string
+      explanation:
+        type: string
+      late_min:
+        type: integer
+      position_in_route:
+        type: integer
+      priority:
+        type: string
+      start_min:
+        type: integer
+      task_id:
+        type: integer
+      tw_end:
+        type: integer
+      tw_start:
+        type: integer
+    type: object
+  dto.Metrics:
+    properties:
+      assigned:
+        type: integer
+      assigned_rate:
+        type: number
+      engineers_used:
+        type: integer
+      late_count:
+        type: integer
+      load_max:
+        type: integer
+      load_mean:
+        type: number
+      load_min:
+        type: integer
+      load_std:
+        type: number
+      overtime_min:
+        type: integer
+      status:
+        type: string
+      total_distance_km:
+        type: number
+      total_late_min:
+        type: integer
+      total_tasks:
+        type: integer
+      unassigned:
+        type: integer
+    type: object
+  dto.PlanResponse:
+    properties:
+      assigned:
+        items:
+          $ref: '#/definitions/dto.AssignedTask'
+        type: array
+      baseline_metrics:
+        $ref: '#/definitions/dto.Metrics'
+      ml_metrics:
+        $ref: '#/definitions/dto.Metrics'
+      routes:
+        items:
+          $ref: '#/definitions/dto.Route'
+        type: array
+      unassigned:
+        items:
+          $ref: '#/definitions/dto.UnassignedTask'
+        type: array
+    type: object
+  dto.ReplanRequest:
+    properties:
+      current_time_min:
+        type: integer
+      new_task:
+        $ref: '#/definitions/entities.Task'
+    type: object
+  dto.Route:
+    properties:
+      distance_km:
+        type: number
+      engineer_id:
+        type: string
+      engineer_name:
+        type: string
+      service_time_min:
+        type: integer
+      tasks:
+        items:
+          $ref: '#/definitions/entities.Task'
+        type: array
+      time_min:
+        type: integer
+      transport:
+        type: string
+      travel_time_min:
+        type: integer
+    type: object
+  dto.UnassignedTask:
+    properties:
+      explanation:
+        type: string
+      reason:
+        type: string
+      task_id:
+        type: integer
+    type: object
+  entities.Equipment:
+    enum:
+    - router
+    - tv_box
+    - cable_kit
+    - optics_kit
+    - gigabit_kit
+    type: string
+    x-enum-varnames:
+    - RouterEq
+    - TvBoxEq
+    - CableKitEq
+    - OpticsKitEq
+    - GigabitKitEq
+  entities.Skill:
+    enum:
+    - basic
+    - fmc
+    - fttb
+    - gigabit
+    - emergency
+    type: string
+    x-enum-varnames:
+    - BasicSkill
+    - FMCSkill
+    - FTTBSkill
+    - GigabitSkill
+    - EmergencySkill
+  entities.Task:
+    properties:
+      address:
+        type: string
+      district:
+        type: string
+      id:
+        type: integer
+      lat:
+        type: number
+      lon:
+        type: number
+      priority:
+        type: string
+      required_equipment:
+        items:
+          $ref: '#/definitions/entities.Equipment'
+        type: array
+      required_skills:
+        items:
+          $ref: '#/definitions/entities.Skill'
+        type: array
+      service_time:
+        type: integer
+      tw_end:
+        type: integer
+      tw_start:
+        type: integer
+      type_bk:
+        type: string
+      type_hd:
+        type: string
+    type: object
+  errors.HttpErrorResponse:
+    properties:
+      error:
+        type: string
+    required:
+    - error
+    type: object
+externalDocs:
+  description: OpenAPI
+host: localhost:80
+info:
+  contact: {}
+  title: Beeline Plan Tasks
+  version: "1.0"
+paths:
+  /plan:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Получает CSV файл через multipart/form-data по ключу "tasks_file"
+        и выполняет оптимальную и неоптимальную планировку
+      parameters:
+      - description: 'регион планирования: east, southeast, southcenter'
+        in: query
+        name: region
+        required: true
+        type: string
+      - description: CSV файл с задачами
+        in: formData
+        name: tasks_file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.PlanResponse'
+        "400":
+          description: required tasks file is missing in multipart form
+          schema:
+            $ref: '#/definitions/errors.HttpErrorResponse'
+        "404":
+          description: address not found
+          schema:
+            $ref: '#/definitions/errors.HttpErrorResponse'
+        "500":
+          description: internal server error
+          schema:
+            $ref: '#/definitions/errors.HttpErrorResponse'
+        "502":
+          description: external service is unavailable
+          schema:
+            $ref: '#/definitions/errors.HttpErrorResponse'
+      summary: Планирование задач по загруженному CSV файлу
+      tags:
+      - Планирование
+  /replan:
+    post:
+      consumes:
+      - application/json
+      description: Получает новую задачу и текущее время и перепланирует план работ
+      parameters:
+      - description: 'регион планирования: east, southeast, southcenter'
+        in: query
+        name: region
+        required: true
+        type: string
+      - description: Данные новой заявки и текущее время
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ReplanRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.PlanResponse'
+        "400":
+          description: invalid request data
+          schema:
+            $ref: '#/definitions/errors.HttpErrorResponse'
+        "404":
+          description: address not found
+          schema:
+            $ref: '#/definitions/errors.HttpErrorResponse'
+        "500":
+          description: internal server error
+          schema:
+            $ref: '#/definitions/errors.HttpErrorResponse'
+        "502":
+          description: external service is unavailable
+          schema:
+            $ref: '#/definitions/errors.HttpErrorResponse'
+      summary: Перепланирование задач по ранее загруженному CSV файлу с учетом новой
+        задачи
+      tags:
+      - Планирование
+schemes:
+- http
+swagger: "2.0"

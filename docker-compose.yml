@@ -1,0 +1,30 @@
+services:
+  beeline_server:
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile
+    image: beeline_server:latest
+    container_name: beeline_server
+    restart: unless-stopped
+    volumes:
+      - .yaml:/.yaml
+      - ./data:/app/data
+    networks:
+      - global-app-network
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx_container
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - global-app-network
+    depends_on:
+      - beeline_server
+
+networks:
+  global-app-network:
+    external: true
