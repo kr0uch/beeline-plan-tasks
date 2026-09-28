@@ -1,4 +1,4 @@
-# МаршрутПро — фронтенд
+# МаршрутПро — веб-интерфейс
 
 React 19 + TypeScript + Vite + Tailwind CSS 4 + React Router, архитектура Feature-Sliced Design.
 
