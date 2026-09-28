@@ -4,7 +4,7 @@ React 19 + TypeScript + Vite + Tailwind CSS 4 + React Router, архитекту
 
 ```bash
 npm install
-npm run dev      # http://localhost:5173, /api проксируется на http://localhost:8080
+npm run dev      # http://localhost:5173, /api проксируется на http://localhost:80 (API_PROXY_TARGET)
 npm run build
 ```
 
