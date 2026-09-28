@@ -67,12 +67,13 @@ function Toggle({ on, onChange }: { on: boolean; onChange: (v: boolean) => void 
   )
 }
 
-type Row = { label: string; icon: string; before: number; after: number; unit: 'num' | 'km' | 'min' | 'pct'; lower: boolean }
+type Row = { label: string; icon: string; before: number; after: number; unit: 'num' | 'dec' | 'km' | 'min' | 'pct'; lower: boolean }
 
 function fmt(v: number, unit: Row['unit']) {
   if (unit === 'km') return `${v.toFixed(1)} км`
   if (unit === 'min') return formatDuration(v)
   if (unit === 'pct') return `${Math.round(v)}%`
+  if (unit === 'dec') return v.toFixed(1)
   return String(v)
 }
 
@@ -83,7 +84,7 @@ function compareRows(ml: Metrics, base: Metrics): Row[] {
     { label: 'Опоздания к абонентам', icon: 'schedule', before: base.late_count, after: ml.late_count, unit: 'num', lower: true },
     { label: 'Суммарный пробег флота', icon: 'speed', before: base.total_distance_km, after: ml.total_distance_km, unit: 'km', lower: true },
     { label: 'Сверхурочные часы бригад', icon: 'more_time', before: base.overtime_min, after: ml.overtime_min, unit: 'min', lower: true },
-    { label: 'Разброс загрузки (σ)', icon: 'balance', before: base.load_std, after: ml.load_std, unit: 'min', lower: true },
+    { label: 'Разброс заявок по бригадам (σ)', icon: 'balance', before: base.load_std, after: ml.load_std, unit: 'dec', lower: true },
   ]
 }
 

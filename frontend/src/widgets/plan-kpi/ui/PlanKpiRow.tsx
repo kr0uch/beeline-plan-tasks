@@ -1,5 +1,4 @@
 import type { Metrics } from '@/entities/plan'
-import { SHIFT_DURATION_MIN } from '@/shared/config'
 import { cn, formatDuration } from '@/shared/lib'
 import { Icon } from '@/shared/ui'
 
@@ -64,7 +63,7 @@ function delta(ml: number, base: number, unit: string, lowerIsBetter: boolean, d
 }
 
 export function PlanKpiRow({ ml, baseline }: { ml: Metrics; baseline: Metrics }) {
-  const loadPct = Math.round((ml.load_mean / SHIFT_DURATION_MIN) * 100)
+
 
   return (
     <section className="grid grid-cols-7 gap-2 border-b border-border bg-bg-app px-4 py-2">
@@ -111,9 +110,9 @@ export function PlanKpiRow({ ml, baseline }: { ml: Metrics; baseline: Metrics })
         label="Загрузка бригад"
         icon="speed"
         iconClass="text-type-upsell"
-        value={`${loadPct}%`}
-        sub={`разброс ±${Math.round(ml.load_std)} мин`}
-        delta={delta(ml.load_std, baseline.load_std, ' мин разброс', true)}
+        value={ml.load_mean.toFixed(1)}
+        sub={`заявок на бригаду, ±${ml.load_std.toFixed(1)}`}
+        delta={delta(ml.load_std, baseline.load_std, ' разброс', true, 1)}
       />
       <KpiCard
         label="Переработки"

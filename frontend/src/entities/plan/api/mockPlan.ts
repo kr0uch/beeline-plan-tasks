@@ -153,7 +153,8 @@ function buildMock(): PlanResponse {
     explanation: u.explanation,
   }))
 
-  const loads = routes.map((r) => r.time_min)
+  const loads = routes.map((r) => r.tasks.length)
+  const minutes = routes.map((r) => r.time_min)
   const mean = loads.reduce((a, b) => a + b, 0) / loads.length
   const std = Math.sqrt(loads.reduce((a, b) => a + (b - mean) ** 2, 0) / loads.length)
   const late = assigned.filter((a) => a.late_min > 0)
@@ -168,7 +169,7 @@ function buildMock(): PlanResponse {
     engineers_used: routes.length,
     late_count: late.length,
     total_late_min: late.reduce((s, a) => s + a.late_min, 0),
-    overtime_min: loads.reduce((s, l) => s + Math.max(0, l - 480), 0),
+    overtime_min: minutes.reduce((s, l) => s + Math.max(0, l - 480), 0),
     total_distance_km: Math.round(routes.reduce((s, r) => s + r.distance_km, 0) * 10) / 10,
     load_min: Math.min(...loads),
     load_max: Math.max(...loads),
