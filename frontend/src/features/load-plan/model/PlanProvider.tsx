@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { buildPlanView, createPlan, fetchCurrentPlan, mockPlan, replanPlan, simulateReplan, type PlanResponse, type Task } from '@/entities/plan'
+import { getSettings } from '@/entities/algorithm-settings'
 import { nowDayMin } from '@/shared/lib'
 import { PLAN_TIME_ORIGIN_MIN, type Region } from '@/shared/config'
 import { PlanContext, type PlanState } from './context'
@@ -61,7 +62,7 @@ export function PlanProvider({ children }: { children: ReactNode }) {
     setState((s) => ({ ...s, region: target, status: 'loading', error: null }))
 
     try {
-      const plan = await createPlan(target, file, controller.signal)
+      const plan = await createPlan(target, file, controller.signal, getSettings().explainWithLLM)
       applyPlan(plan, { isDemo: false, fileName: file.name, previous: null, replanTask: null })
       return true
     } catch (e) {
@@ -106,7 +107,7 @@ export function PlanProvider({ children }: { children: ReactNode }) {
     const body = { current_time_min: nowDayMin() - PLAN_TIME_ORIGIN_MIN, new_task: task }
     setState((s) => ({ ...s, status: 'loading', error: null }))
     try {
-      const plan = current.isDemo ? simulateReplan(current.plan, body) : await replanPlan(current.region, body)
+      const plan = current.isDemo ? simulateReplan(current.plan, body) : await replanPlan(current.region, body, undefined, getSettings().explainWithLLM)
       applyPlan(plan, { previous, replanTask: task })
       return true
     } catch (e) {
