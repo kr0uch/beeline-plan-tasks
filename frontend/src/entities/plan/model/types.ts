@@ -36,6 +36,7 @@ export type UnassignedTask = {
   task_id: number
   reason: string
   explanation: string
+  task?: Task
 }
 
 export type Route = {
@@ -64,6 +65,8 @@ export type Metrics = {
   load_max: number
   load_mean: number
   load_std: number
+  total_time_min?: number
+  total_travel_min?: number
 }
 
 export type PlanResponse = {
@@ -72,6 +75,56 @@ export type PlanResponse = {
   routes: Route[]
   ml_metrics: Metrics
   baseline_metrics: Metrics
+  changes?: PlanChange[]
+}
+
+export type PlanChangeType = 'added' | 'added_unassigned' | 'assigned' | 'reassigned' | 'rescheduled' | 'unassigned'
+
+export type PlanChange = {
+  task_id: number
+  type: PlanChangeType
+  from_engineer_id?: string
+  to_engineer_id?: string
+  old_start_min?: number
+  new_start_min?: number
+  delta_min?: number
+}
+
+export type RawAssignedTask = Omit<AssignedTask, 'tw_start' | 'tw_end'> & {
+  tw_start?: number
+  tw_end?: number
+  task?: Task
+}
+
+export type RawPlanResponse = Omit<PlanResponse, 'assigned' | 'baseline_metrics'> & {
+  assigned: RawAssignedTask[] | null
+  unassigned: UnassignedTask[] | null
+  routes: Route[] | null
+  baseline_metrics: Metrics | null
+}
+
+export type Engineer = {
+  id: string
+  name: string
+  skills: Skill[] | null
+  equipment: Equipment[] | null
+  transport: string
+  shift_start: number
+  shift_end: number
+  depot_address: string
+  depot_lat?: number
+  depot_lon?: number
+  task_count: number
+  task_ids: number[] | null
+  distance_km: number
+  travel_time_min: number
+  service_time_min: number
+  load_percent: number
+}
+
+export type Health = {
+  status: string
+  ml: string
 }
 
 export type ReplanRequest = {

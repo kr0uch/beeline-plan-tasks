@@ -84,8 +84,8 @@ export function ReplanPage() {
   const now = useNow()
   const [applied, setApplied] = useState(false)
   const scenario = useMemo(
-    () => (view ? buildScenario(view, replanTask && previous ? { taskId: replanTask.id, previous: previous.view } : undefined) : null),
-    [view, replanTask, previous],
+    () => (view ? buildScenario(view, replanTask && previous ? { taskId: replanTask.id, previous: previous.view, changes: plan?.changes } : undefined) : null),
+    [view, replanTask, previous, plan],
   )
   const nextId = view ? Math.max(0, ...view.tasks.keys(), ...view.unassigned.map((u) => u.task_id)) + 1 : 1
   const form = (onCancel?: () => void) => (

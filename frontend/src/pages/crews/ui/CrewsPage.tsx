@@ -1,9 +1,9 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router'
-import { crewShortName, transportIcon, type Crew, type PlanView } from '@/entities/plan'
+import { crewShortName, fetchEngineers, transportIcon, type Crew, type Engineer, type PlanView } from '@/entities/plan'
 import { getTaskKind, requirementLabel, TASK_KIND_META, type TaskKind } from '@/entities/task'
 import { PlanUploadForm, usePlan } from '@/features/load-plan'
-import { cn, formatDuration, formatPlanTime, plural, toDayMin, useNow } from '@/shared/lib'
+import { cn, formatClock, formatDuration, formatPlanTime, plural, toDayMin, useNow } from '@/shared/lib'
 import { Badge, Icon } from '@/shared/ui'
 
 type Mode = 'all' | 'car' | 'walk'
@@ -11,11 +11,13 @@ type Level = 'required' | 'preferred' | 'none'
 
 const isWalk = (c: Crew) => transportIcon(c.transport) === 'directions_walk'
 
-function crewSkills(c: Crew) {
+function crewSkills(c: Crew, e?: Engineer): string[] {
+  if (e?.skills?.length) return e.skills
   return [...new Set(c.stops.flatMap((s) => s.task.required_skills))]
 }
 
-function crewEquipment(c: Crew) {
+function crewEquipment(c: Crew, e?: Engineer): string[] {
+  if (e?.equipment?.length) return e.equipment
   return [...new Set(c.stops.flatMap((s) => s.task.required_equipment))]
 }
 
@@ -52,11 +54,11 @@ const LEVEL: Record<Level, { label: string; className: string }> = {
   none: { label: 'Не требуется', className: 'text-text-muted' },
 }
 
-function CrewCard({ crew, now, onOpen }: { crew: Crew; now: number; onOpen: () => void }) {
+function CrewCard({ crew, engineer, now, onOpen }: { crew: Crew; engineer?: Engineer; now: number; onOpen: () => void }) {
   const state = crewState(crew, now)
   const done = crew.stops.filter((s) => s.assignment && toDayMin(s.assignment.end_min) <= now).length
-  const skills = crewSkills(crew)
-  const equipment = crewEquipment(crew)
+  const skills = crewSkills(crew, engineer)
+  const equipment = crewEquipment(crew, engineer)
   return (
     <div className={cn('flex flex-col rounded-lg border border-t-4 border-border bg-bg-surface p-4 shadow-sm', state.bar)}>
       <div className="mb-3 flex items-start gap-3">
@@ -65,7 +67,7 @@ function CrewCard({ crew, now, onOpen }: { crew: Crew; now: number; onOpen: () =
         </span>
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-2">
-            <span className="text-title-md">{crew.name}</span>
+            <span className="truncate text-title-md">{engineer?.name || crew.name}</span>
             <Badge className={state.tone}>{state.label}</Badge>
           </div>
           <div className="truncate text-label-md text-text-muted">{skills.map(requirementLabel).join(' • ') || 'Универсальный монтаж'}</div>
@@ -79,6 +81,21 @@ function CrewCard({ crew, now, onOpen }: { crew: Crew; now: number; onOpen: () =
           {crew.distanceKm.toFixed(1)} км • {formatDuration(crew.timeMin)}
         </span>
       </div>
+
+      {engineer && (
+        <div className="mb-3 space-y-1 rounded-lg bg-bg-subtle p-2 text-label-md text-text-secondary">
+          <div className="flex items-center gap-1.5">
+            <Icon name="schedule" size={14} />
+            Смена {formatClock(engineer.shift_start)} – {formatClock(engineer.shift_end)}
+          </div>
+          {engineer.depot_address && (
+            <div className="flex items-center gap-1.5">
+              <Icon name="warehouse" size={14} />
+              <span className="truncate">{engineer.depot_address}</span>
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="mb-3">
         <div className="mb-1 text-label-sm font-semibold tracking-wider text-text-muted uppercase">Оборудование на борту</div>
@@ -124,7 +141,17 @@ function CrewCard({ crew, now, onOpen }: { crew: Crew; now: number; onOpen: () =
 }
 
 export function CrewsPage() {
-  const { plan, view } = usePlan()
+  const { plan, view, region, isDemo } = usePlan()
+  const [engineers, setEngineers] = useState<Map<string, Engineer>>(new Map())
+  useEffect(() => {
+    if (!plan || isDemo) return
+    const controller = new AbortController()
+    fetchEngineers(region, controller.signal)
+      .then((list) => setEngineers(new Map(list.map((e) => [e.id, e]))))
+      .catch(() => undefined)
+    return () => controller.abort()
+  }, [plan, isDemo, region])
+  const eng = (id: string) => (isDemo ? undefined : engineers.get(id))
   const navigate = useNavigate()
   const now = useNow()
   const [query, setQuery] = useState('')
@@ -142,12 +169,12 @@ export function CrewsPage() {
 
   const walk = view.crews.filter(isWalk).length
   const states = view.crews.map((c) => crewState(c, now))
-  const allSkills = [...new Set(view.crews.flatMap(crewSkills))]
+  const allSkills = [...new Set(view.crews.flatMap((c) => crewSkills(c, eng(c.id))))]
   const q = query.trim().toLowerCase()
   const crews = view.crews.filter(
     (c) =>
       (mode === 'all' || (mode === 'walk') === isWalk(c)) &&
-      (!skill || (crewSkills(c) as string[]).includes(skill)) &&
+      (!skill || crewSkills(c, eng(c.id)).includes(skill)) &&
       (!q || `${c.name} ${c.transport}`.toLowerCase().includes(q)),
   )
   const avgLoad = Math.round(view.crews.reduce((s, c) => s + c.loadPct, 0) / view.crews.length)
@@ -224,7 +251,7 @@ export function CrewsPage() {
 
       <section className="grid grid-cols-3 gap-4">
         {crews.map((crew) => (
-          <CrewCard key={crew.id} crew={crew} now={now} onOpen={() => navigate(`/planning?task=${crew.stops[0]?.task.id ?? ''}`)} />
+          <CrewCard key={crew.id} crew={crew} engineer={eng(crew.id)} now={now} onOpen={() => navigate(`/planning?task=${crew.stops[0]?.task.id ?? ''}`)} />
         ))}
         <div className="flex flex-col rounded-lg border border-border bg-bg-surface p-4 shadow-sm">
           <div className="flex items-center justify-between text-label-sm tracking-wider text-text-muted uppercase">

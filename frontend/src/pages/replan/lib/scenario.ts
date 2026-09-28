@@ -1,4 +1,4 @@
-import type { AssignedTask, Crew, PlannedStop, PlanView, Task } from '@/entities/plan'
+import type { AssignedTask, Crew, PlanChange, PlannedStop, PlanView, Task } from '@/entities/plan'
 import { getTaskKind, isCriticalPriority } from '@/entities/task'
 
 export type TimelineItem = {
@@ -90,7 +90,7 @@ function timeline(stops: PlannedStop[], emergencyId: number, shifted: Set<number
   )
 }
 
-export function buildScenario(view: PlanView, replan?: { taskId: number; previous: PlanView }): Scenario | null {
+export function buildScenario(view: PlanView, replan?: { taskId: number; previous: PlanView; changes?: PlanChange[] }): Scenario | null {
   const picked = replan ? findTask(view, replan.taskId) : pickEmergency(view)
   if (!picked) return null
   const { crew, index } = picked
@@ -146,7 +146,13 @@ export function buildScenario(view: PlanView, replan?: { taskId: number; previou
     const prevCrew = replan.previous.crews.find((c) => c.id === crew.id)
     const shifted = new Set<number>()
     const affected = new Set<string>([crew.id])
-    for (const c of view.crews) {
+    const changes = (replan.changes ?? []).filter((ch) => ch.task_id !== replan.taskId)
+    for (const ch of changes) {
+      shifted.add(ch.task_id)
+      if (ch.to_engineer_id) affected.add(ch.to_engineer_id)
+      if (ch.from_engineer_id) affected.add(ch.from_engineer_id)
+    }
+    if (!replan.changes) for (const c of view.crews) {
       for (const st of c.stops) {
         const old = replan.previous.assignments.get(st.task.id)
         if (st.assignment && old && (old.start_min !== st.assignment.start_min || old.engineer_id !== st.assignment.engineer_id)) {
