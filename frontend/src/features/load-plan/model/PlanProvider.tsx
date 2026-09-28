@@ -1,18 +1,21 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
-import { buildPlanView, createPlan, mockPlan, type PlanResponse } from '@/entities/plan'
-import type { Region } from '@/shared/config'
+import { buildPlanView, createPlan, mockPlan, replanPlan, simulateReplan, type PlanResponse, type Task } from '@/entities/plan'
+import { nowDayMin } from '@/shared/lib'
+import { PLAN_TIME_ORIGIN_MIN, type Region } from '@/shared/config'
 import { PlanContext, type PlanState } from './context'
 
 const initialState: PlanState = {
   status: 'idle',
   error: null,
-  region: 'yugo-centr',
+  region: 'southcenter',
   fileName: null,
   isDemo: false,
   plan: null,
   view: null,
   updatedAt: null,
   history: [],
+  previous: null,
+  replanTask: null,
 }
 
 export function PlanProvider({ children }: { children: ReactNode }) {
@@ -59,7 +62,7 @@ export function PlanProvider({ children }: { children: ReactNode }) {
 
     try {
       const plan = await createPlan(target, file, controller.signal)
-      applyPlan(plan, { isDemo: false, fileName: file.name })
+      applyPlan(plan, { isDemo: false, fileName: file.name, previous: null, replanTask: null })
     } catch (e) {
       if (controller.signal.aborted) return
       setState((s) => ({
@@ -73,7 +76,28 @@ export function PlanProvider({ children }: { children: ReactNode }) {
   const loadDemo = useCallback(() => {
     abort.current?.abort()
     lastFile.current = null
-    applyPlan(mockPlan, { isDemo: true, fileName: 'demo.csv' })
+    applyPlan(mockPlan, { isDemo: true, fileName: 'demo.csv', previous: null, replanTask: null })
+  }, [])
+
+  const stateRef = useRef(state)
+  useEffect(() => {
+    stateRef.current = state
+  }, [state])
+
+  const replan = useCallback(async (task: Task) => {
+    const current = stateRef.current
+    if (!current.plan || !current.view) return false
+    const previous = { plan: current.plan, view: current.view }
+    const body = { current_time_min: nowDayMin() - PLAN_TIME_ORIGIN_MIN, new_task: task }
+    setState((s) => ({ ...s, status: 'loading', error: null }))
+    try {
+      const plan = current.isDemo ? simulateReplan(current.plan, body) : await replanPlan(current.region, body)
+      applyPlan(plan, { previous, replanTask: task })
+      return true
+    } catch (e) {
+      setState((s) => ({ ...s, status: 'error', error: e instanceof Error ? e.message : 'Не удалось перепланировать' }))
+      return false
+    }
   }, [])
 
   const recalculate = useCallback(async () => {
@@ -90,8 +114,8 @@ export function PlanProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const value = useMemo(
-    () => ({ ...state, setRegion, submit, recalculate, loadDemo, reset }),
-    [state, setRegion, submit, recalculate, loadDemo, reset],
+    () => ({ ...state, setRegion, submit, recalculate, loadDemo, replan, reset }),
+    [state, setRegion, submit, recalculate, loadDemo, replan, reset],
   )
 
   return <PlanContext.Provider value={value}>{children}</PlanContext.Provider>

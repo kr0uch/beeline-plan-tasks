@@ -1,3 +1,4 @@
+import { requirementList, type Equipment, type Skill } from '@/entities/task'
 import type { AssignedTask, Metrics, PlanResponse, Route, Task, UnassignedTask } from '../model/types'
 
 
@@ -64,6 +65,21 @@ const distanceKm = (a: Seed, b: Seed) => {
   return Math.sqrt(dx * dx + dy * dy) * 1.35
 }
 
+const SKILL_MAP: Record<string, Skill> = { ВОЛС: 'fttb', Сварка: 'fttb', GPON: 'fmc', Медь: 'basic', 'Wi-Fi': 'basic', IPTV: 'basic', Сети: 'gigabit' }
+const EQUIPMENT_MAP: Record<string, Equipment> = {
+  ONT: 'optics_kit',
+  Тестер: 'cable_kit',
+  'Сварочный аппарат': 'optics_kit',
+  Рефлектометр: 'optics_kit',
+  Роутер: 'router',
+  Приставка: 'tv_box',
+  Медиаконвертер: 'gigabit_kit',
+  Модем: 'router',
+  Коммутатор: 'gigabit_kit',
+}
+
+const mapUnique = <T,>(values: string[], map: Record<string, T>): T[] => [...new Set(values.map((v) => map[v]).filter(Boolean))]
+
 function buildMock(): PlanResponse {
   const tasks: Task[] = SEEDS.map((s, i) => {
     const center = 600 + (i % 8) * 50
@@ -74,8 +90,8 @@ function buildMock(): PlanResponse {
       lat: s.lat,
       lon: s.lon,
       priority: s.priority,
-      required_equipment: s.equipment,
-      required_skills: s.skills,
+      required_equipment: mapUnique(s.equipment, EQUIPMENT_MAP),
+      required_skills: [...mapUnique(s.skills, SKILL_MAP), ...(s.type_hd === 'Авария' ? (['emergency'] as Skill[]) : [])],
       service_time: s.service,
       tw_start: center - 90,
       tw_end: center + 90,
@@ -100,8 +116,8 @@ function buildMock(): PlanResponse {
       const end = start + task.service_time
       clock = end
       const reasons = [
-        `Навыки ${task.required_skills.join(', ') || '—'} есть у бригады`,
-        task.required_equipment.length ? `оборудование (${task.required_equipment.join(', ')}) в наличии` : null,
+        `Навыки «${requirementList(task.required_skills) || '—'}» есть у бригады`,
+        task.required_equipment.length ? `оборудование (${requirementList(task.required_equipment)}) в наличии` : null,
         late ? `опоздание ${late} мин допущено: других свободных бригад с этими навыками нет` : 'прибытие в окне клиента',
         pos > 0 ? `ближайшая точка к предыдущей заявке маршрута` : 'первая точка маршрута от базы',
       ].filter(Boolean)

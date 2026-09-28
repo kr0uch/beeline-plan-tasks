@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { crewShortName, ORDER_STATUS_META, transportIcon, type Order, type OrderStatus } from '@/entities/plan'
-import { getPriorityMeta, TASK_KIND_META } from '@/entities/task'
+import { getPriorityMeta, requirementLabel, TASK_KIND_META } from '@/entities/task'
 import { cn, formatClock, formatDuration, formatPlanTime, plural, toDayMin } from '@/shared/lib'
 import { Badge, Icon } from '@/shared/ui'
 
@@ -235,10 +235,10 @@ export function OrderCard({ order, now, replanning, onClose, onReplan, onOpenRou
           >
             {[...task.required_skills.map((name) => ({ name, tag: 'Квалификация' })), ...task.required_equipment.map((name) => ({ name, tag: 'Оборудование' }))].map(
               (item) => (
-                <div key={`${item.tag}-${item.name}`} className="flex items-center justify-between rounded-lg border border-border bg-bg-subtle p-2">
+                <div key={`${item.tag}-${requirementLabel(item.name)}`} className="flex items-center justify-between rounded-lg border border-border bg-bg-subtle p-2">
                   <span className="flex items-center gap-2 text-body-sm">
                     <Icon name={assignment ? 'task_alt' : 'help'} className={assignment ? 'text-status-completed' : 'text-text-muted'} />
-                    {item.name}
+                    {requirementLabel(item.name)}
                   </span>
                   <span className="text-[10px] text-text-muted uppercase">{item.tag}</span>
                 </div>
