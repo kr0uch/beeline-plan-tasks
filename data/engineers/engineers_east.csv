@@ -1,13 +1,13 @@
 ID;ФИО/Бригада;Навыки;Оборудование;Транспорт;Начало смены;Конец смены;Адрес;Широта;Долгота
-eng_00;Соколов;basic, emergency, fmc;router, tv_box, cable_kit, optics_kit;car;09:00;22:00;г. Москва, ул Юных Ленинцев, д 83с 4;55.702201;37.773959
-eng_01;Мельников;basic, emergency, fmc, gigabit;router, tv_box, cable_kit, optics_kit, gigabit_kit;car;09:00;22:00;г. Москва, ул Юных Ленинцев, д 83с 4;55.702201;37.773959
-eng_02;Матвеев;basic, emergency, fmc;router, tv_box, cable_kit, optics_kit;car;09:00;22:00;г. Москва, ул Юных Ленинцев, д 83с 4;55.702201;37.773959
-eng_03;Попов;basic, emergency, fmc, fttb, gigabit;router, tv_box, cable_kit, optics_kit, gigabit_kit;car;09:00;22:00;г. Москва, ул Юных Ленинцев, д 83с 4;55.702201;37.773959
-eng_04;Арташкин;basic, emergency, fmc;router, tv_box, cable_kit, optics_kit;car;09:00;22:00;г. Москва, ул Юных Ленинцев, д 83с 4;55.702201;37.773959
-eng_05;Комарь;basic, emergency, fmc;router, tv_box, cable_kit, optics_kit;car;09:00;22:00;г. Москва, ул Юных Ленинцев, д 83с 4;55.702201;37.773959
-eng_06;Каушнян;basic, emergency, fmc, gigabit;router, tv_box, cable_kit, optics_kit, gigabit_kit;car;09:00;22:00;г. Москва, ул Юных Ленинцев, д 83с 4;55.702201;37.773959
-eng_07;Зверев;basic, emergency, fmc;router, tv_box, cable_kit, optics_kit;car;09:00;22:00;г. Москва, ул Юных Ленинцев, д 83с 4;55.702201;37.773959
-eng_08;Перов;basic, emergency, fmc, fttb;router, tv_box, cable_kit, optics_kit;car;09:00;22:00;г. Москва, ул Юных Ленинцев, д 83с 4;55.702201;37.773959
-eng_09;Белузин;basic, emergency;router, tv_box, cable_kit, optics_kit;car;09:00;22:00;г. Москва, ул Юных Ленинцев, д 83с 4;55.702201;37.773959
-eng_10;Гусаковский;basic, emergency;router, tv_box, cable_kit, optics_kit;car;09:00;22:00;г. Москва, ул Юных Ленинцев, д 83с 4;55.702201;37.773959
-eng_11;Свеженцев;basic, emergency;router, tv_box, cable_kit, optics_kit;car;09:00;22:00;г. Москва, ул Юных Ленинцев, д 83с 4;55.702201;37.773959
+eng_00;Соколов;basic, emergency, fmc;router, tv_box, cable_kit, optics_kit;car;09:00;22:00;г. Москва, ул Юных Ленинцев, д 83с 4;55.6963;37.7577
+eng_01;Мельников;basic, emergency, fmc, gigabit;router, tv_box, cable_kit, optics_kit, gigabit_kit;car;09:00;22:00;г. Москва, ул Юных Ленинцев, д 83с 4;55.6963;37.7577
+eng_02;Матвеев;basic, emergency, fmc;router, tv_box, cable_kit, optics_kit;car;09:00;22:00;г. Москва, ул Юных Ленинцев, д 83с 4;55.6963;37.7577
+eng_03;Попов;basic, emergency, fmc, fttb, gigabit;router, tv_box, cable_kit, optics_kit, gigabit_kit;car;09:00;22:00;г. Москва, ул Юных Ленинцев, д 83с 4;55.6963;37.7577
+eng_04;Арташкин;basic, emergency, fmc;router, tv_box, cable_kit, optics_kit;car;09:00;22:00;г. Москва, ул Юных Ленинцев, д 83с 4;55.6963;37.7577
+eng_05;Комарь;basic, emergency, fmc;router, tv_box, cable_kit, optics_kit;car;09:00;22:00;г. Москва, ул Юных Ленинцев, д 83с 4;55.6963;37.7577
+eng_06;Каушнян;basic, emergency, fmc, gigabit;router, tv_box, cable_kit, optics_kit, gigabit_kit;car;09:00;22:00;г. Москва, ул Юных Ленинцев, д 83с 4;55.6963;37.7577
+eng_07;Зверев;basic, emergency, fmc;router, tv_box, cable_kit, optics_kit;car;09:00;22:00;г. Москва, ул Юных Ленинцев, д 83с 4;55.6963;37.7577
+eng_08;Перов;basic, emergency, fmc, fttb;router, tv_box, cable_kit, optics_kit;car;09:00;22:00;г. Москва, ул Юных Ленинцев, д 83с 4;55.6963;37.7577
+eng_09;Белузин;basic, emergency;router, tv_box, cable_kit, optics_kit;car;09:00;22:00;г. Москва, ул Юных Ленинцев, д 83с 4;55.6963;37.7577
+eng_10;Гусаковский;basic, emergency;router, tv_box, cable_kit, optics_kit;car;09:00;22:00;г. Москва, ул Юных Ленинцев, д 83с 4;55.6963;37.7577
+eng_11;Свеженцев;basic, emergency;router, tv_box, cable_kit, optics_kit;car;09:00;22:00;г. Москва, ул Юных Ленинцев, д 83с 4;55.6963;37.7577

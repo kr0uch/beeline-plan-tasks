@@ -1,0 +1,13 @@
+ID;ФИО/Бригада;Навыки;Оборудование;Транспорт;Начало смены;Конец смены;Адрес;Широта;Долгота
+eng_00;Капитанчук Александр;basic, emergency, fmc;router, tv_box, cable_kit, optics_kit;car;09:00;22:00;г. Москва, проезд Симферопольский, д.7;55.653;37.605
+eng_01;Исхаков Денис;basic, emergency, fmc, fttb, gigabit;router, tv_box, cable_kit, optics_kit, gigabit_kit;car;09:00;22:00;г. Москва, проезд Симферопольский, д.7;55.653;37.605
+eng_02;Брюзгин Ярослав;basic, emergency, fmc, gigabit;router, tv_box, cable_kit, optics_kit, gigabit_kit;car;09:00;22:00;г. Москва, проезд Симферопольский, д.7;55.653;37.605
+eng_03;Бахарев Андрей;basic, emergency, fmc;router, tv_box, cable_kit, optics_kit;car;09:00;22:00;г. Москва, проезд Симферопольский, д.7;55.653;37.605
+eng_04;Прокопенко Вячеслав;basic, emergency, fmc;router, tv_box, cable_kit, optics_kit;car;09:00;22:00;г. Москва, проезд Симферопольский, д.7;55.653;37.605
+eng_05;Выговский Сергей;basic, emergency, fmc;router, tv_box, cable_kit, optics_kit;car;09:00;22:00;г. Москва, проезд Симферопольский, д.7;55.653;37.605
+eng_06;Переладов Алексей;basic, emergency, fmc;router, tv_box, cable_kit, optics_kit;car;09:00;22:00;г. Москва, проезд Симферопольский, д.7;55.653;37.605
+eng_07;Сакур Тимофей;basic, emergency, fmc;router, tv_box, cable_kit, optics_kit;car;09:00;22:00;г. Москва, проезд Симферопольский, д.7;55.653;37.605
+eng_08;Рыбалкин Егор;basic, emergency, fmc;router, tv_box, cable_kit, optics_kit;car;09:00;22:00;г. Москва, проезд Симферопольский, д.7;55.653;37.605
+eng_09;Ионов Геннадий;basic, emergency, fmc;router, tv_box, cable_kit, optics_kit;car;09:00;22:00;г. Москва, проезд Симферопольский, д.7;55.653;37.605
+eng_10;Данилов Даниил;basic, emergency;router, tv_box, cable_kit, optics_kit;car;09:00;22:00;г. Москва, проезд Симферопольский, д.7;55.653;37.605
+eng_11;Свеженцев;basic, emergency;router, tv_box, cable_kit, optics_kit;car;09:00;22:00;г. Москва, проезд Симферопольский, д.7;55.653;37.605
