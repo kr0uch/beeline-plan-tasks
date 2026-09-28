@@ -7,7 +7,7 @@ import (
 	"time"
 
 	_ "github.com/kr0uch/beeline-plan-tasks/docs"
-	"github.com/kr0uch/beeline-plan-tasks/internal/core/repository"
+	"github.com/kr0uch/beeline-plan-tasks/internal/transport/api/handlers"
 	"github.com/kr0uch/beeline-plan-tasks/internal/transport/api/routers"
 	"github.com/kr0uch/beeline-plan-tasks/pkg/logger"
 	"github.com/kr0uch/beeline-plan-tasks/pkg/web"
@@ -34,24 +34,12 @@ const VersionPrefix = "/api/v1"
 func NewServer(
 	config ServerConfig,
 	logger logger.Logger,
-	engineerRepository repository.EngineerRepository,
-	taskRepository repository.TaskRepository,
-	mlRepository repository.MLRepository,
-	geoRepository repository.GeoRepository,
-	groqClient repository.GroqClient,
-	cacheRepository repository.CacheRepository,
+	planService handlers.PlanService,
 ) *Server {
 
 	mainMux := http.NewServeMux()
 
-	planRouter := routers.NewPlanRouter(
-		engineerRepository,
-		taskRepository,
-		mlRepository,
-		geoRepository,
-		groqClient,
-		cacheRepository,
-	)
+	planRouter := routers.NewPlanRouter(planService)
 
 	apiMux := http.NewServeMux()
 	apiMux.Handle("/", planRouter)

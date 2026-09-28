@@ -10,7 +10,8 @@ type Config struct {
 	servers.ServerConfig `yaml:"server"`
 	logger.LoggerConfig  `yaml:"logger"`
 
-	MLServiceURL string `yaml:"ml_service_url"`
+	MLServiceURL   string `yaml:"ml_service_url"`
+	MLTimeLimitSec int    `yaml:"ml_time_limit_sec" env-default:"10"`
 
 	EngineersDataDir string `yaml:"engineers_data_dir"`
 	CacheDataDir     string `yaml:"cache_data_dir"`

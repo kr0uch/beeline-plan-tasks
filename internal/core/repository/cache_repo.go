@@ -4,246 +4,163 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io"
 	"os"
-	"path"
+	"path/filepath"
+	"sync"
 
 	"github.com/kr0uch/beeline-plan-tasks/internal/core/models/dto"
 	"github.com/kr0uch/beeline-plan-tasks/internal/core/models/entities"
 )
 
-type CacheRepository interface {
-	SetRoutesByRegion(
-		ctx context.Context,
-		routes []dto.Route,
-		region string,
-	) error
-	GetRoutesByRegion(
-		ctx context.Context,
-		region string,
-	) ([]dto.Route, error)
-	SetTasksByRegion(
-		ctx context.Context,
-		tasks []*entities.Task,
-		region string,
-	) error
-	AppendTaskByRegion(
-		ctx context.Context,
-		task *entities.Task,
-		region string,
-	) error
-	GetTasksByRegion(
-		ctx context.Context,
-		region string,
-	) ([]*entities.Task, error)
-	LoadGeoCache(
-		region string,
-	) (map[string]entities.GeoData, error)
-	SaveGeoCache(
-		region string,
-		cache map[string]entities.GeoData,
-	) error
-	LoadDepots(
-		ctx context.Context,
-		region string,
-	) (map[string]entities.GeoData, error)
-}
-
-type cacheRepo struct {
+type CacheRepo struct {
 	basePath string
+	mu       sync.Mutex
 }
 
-func NewCacheRepository(basePath string) CacheRepository {
-	return &cacheRepo{
-		basePath: basePath,
-	}
+func NewCacheRepository(basePath string) *CacheRepo {
+	return &CacheRepo{basePath: basePath}
 }
 
-const routesTemplate = "%s/routes_%s.json"
+func (r *CacheRepo) filePath(kind, region string) string {
+	return filepath.Join(r.basePath, region, fmt.Sprintf("%s_%s.json", kind, region))
+}
 
-func (r *cacheRepo) SetRoutesByRegion(
+func (r *CacheRepo) SetPlanByRegion(
 	ctx context.Context,
-	routes []dto.Route,
+	plan *dto.PlanResponse,
 	region string,
 ) error {
-	filePath := path.Join(r.basePath, fmt.Sprintf(routesTemplate, region, region))
+	r.mu.Lock()
+	defer r.mu.Unlock()
 
-	file, err := os.OpenFile(filePath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-
-	bytes, err := json.Marshal(routes)
-	if err != nil {
-		return err
-	}
-
-	if _, err := file.Write(bytes); err != nil {
-		return err
-	}
-
-	return nil
+	return writeJSON(r.filePath("plan", region), plan)
 }
 
-func (r *cacheRepo) GetRoutesByRegion(
+func (r *CacheRepo) GetPlanByRegion(
 	ctx context.Context,
 	region string,
-) ([]dto.Route, error) {
-	filePath := path.Join(r.basePath, fmt.Sprintf(routesTemplate, region, region))
-
-	file, err := os.Open(filePath)
-	if err != nil {
+) (*dto.PlanResponse, error) {
+	var plan dto.PlanResponse
+	if err := readJSON(r.filePath("plan", region), &plan); err != nil {
 		return nil, err
 	}
-	defer file.Close()
-
-	var routes []dto.Route
-	if err := json.NewDecoder(file).Decode(&routes); err != nil {
-		return nil, err
-	}
-
-	return routes, nil
+	return &plan, nil
 }
 
-const tasksTemplate = "%s/tasks_%s.json"
-
-func (r *cacheRepo) SetTasksByRegion(
+func (r *CacheRepo) SetTasksByRegion(
 	ctx context.Context,
 	tasks []*entities.Task,
 	region string,
 ) error {
-	filePath := path.Join(r.basePath, fmt.Sprintf(tasksTemplate, region, region))
+	r.mu.Lock()
+	defer r.mu.Unlock()
 
-	dir := path.Dir(filePath)
-	if err := os.MkdirAll(dir, 0755); err != nil {
-		return err
-	}
-
-	file, err := os.OpenFile(filePath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-
-	bytes, err := json.Marshal(tasks)
-	if err != nil {
-		return err
-	}
-
-	if _, err := file.Write(bytes); err != nil {
-		return err
-	}
-
-	return nil
+	return writeJSON(r.filePath("tasks", region), tasks)
 }
 
-func (r *cacheRepo) AppendTaskByRegion(
+func (r *CacheRepo) AppendTaskByRegion(
 	ctx context.Context,
 	task *entities.Task,
 	region string,
 ) error {
-	tasks, err := r.GetTasksByRegion(ctx, region)
-	if err != nil && !os.IsNotExist(err) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	path := r.filePath("tasks", region)
+
+	var tasks []*entities.Task
+	if err := readJSON(path, &tasks); err != nil && !os.IsNotExist(err) {
 		return err
 	}
 
-	tasks = append(tasks, task)
-
-	return r.SetTasksByRegion(ctx, tasks, region)
+	return writeJSON(path, append(tasks, task))
 }
 
-func (r *cacheRepo) GetTasksByRegion(
+func (r *CacheRepo) GetTasksByRegion(
 	ctx context.Context,
 	region string,
 ) ([]*entities.Task, error) {
-
-	filePath := path.Join(r.basePath, fmt.Sprintf(tasksTemplate, region, region))
-	file, err := os.Open(filePath)
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
-
 	var tasks []*entities.Task
-	if err := json.NewDecoder(file).Decode(&tasks); err != nil {
+	if err := readJSON(r.filePath("tasks", region), &tasks); err != nil {
 		return nil, err
 	}
-
 	return tasks, nil
 }
 
-const geoDataTemplate = "%s/geo_data_%s.json"
-
-func (r *cacheRepo) LoadGeoCache(
-	region string,
-) (map[string]entities.GeoData, error) {
-
-	filePath := path.Join(r.basePath, fmt.Sprintf(geoDataTemplate, region, region))
-
-	file, err := os.Open(filePath)
-	if os.IsNotExist(err) {
-		return make(map[string]entities.GeoData), nil
-	} else if err != nil {
-		return nil, err
-	}
-	defer file.Close()
-
-	cache := make(map[string]entities.GeoData)
-	decoder := json.NewDecoder(file)
-	if err := decoder.Decode(&cache); err != nil && err != io.EOF {
-		return nil, err
-	}
-	return cache, nil
-}
-
-func (r *cacheRepo) SaveGeoCache(
-	region string,
-	cache map[string]entities.GeoData,
-) error {
-
-	filePath := path.Join(r.basePath, fmt.Sprintf(geoDataTemplate, region, region))
-
-	file, err := os.OpenFile(filePath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-
-	bytes, err := json.MarshalIndent(cache, "", "  ")
-	if err != nil {
-		return err
-	}
-
-	if _, err := file.Write(bytes); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-const depotTemplate = "%s/depot_%s.json"
-
-func (r *cacheRepo) LoadDepots(
+func (r *CacheRepo) LoadGeoCache(
 	ctx context.Context,
 	region string,
 ) (map[string]entities.GeoData, error) {
+	return readGeoMap(r.filePath("geo_data", region))
+}
 
-	filePath := path.Join(r.basePath, fmt.Sprintf(depotTemplate, region, region))
+func (r *CacheRepo) SaveGeoCache(
+	ctx context.Context,
+	region string,
+	cache map[string]entities.GeoData,
+) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
 
-	file, err := os.Open(filePath)
+	return writeJSON(r.filePath("geo_data", region), cache)
+}
+
+func (r *CacheRepo) LoadDepots(
+	ctx context.Context,
+	region string,
+) (map[string]entities.GeoData, error) {
+	return readGeoMap(r.filePath("depot", region))
+}
+
+func readGeoMap(path string) (map[string]entities.GeoData, error) {
+	result := make(map[string]entities.GeoData)
+	if err := readJSON(path, &result); err != nil && !os.IsNotExist(err) {
+		return nil, err
+	}
+	return result, nil
+}
+
+func readJSON(path string, dst any) error {
+	data, err := os.ReadFile(path)
 	if err != nil {
-		if os.IsNotExist(err) {
-			return make(map[string]entities.GeoData), nil
-		}
-		return nil, err
+		return err
 	}
-	defer file.Close()
+	if len(data) == 0 {
+		return nil
+	}
+	return json.Unmarshal(data, dst)
+}
 
-	var depots map[string]entities.GeoData
-	if err := json.NewDecoder(file).Decode(&depots); err != nil {
-		return nil, err
+func writeJSON(path string, value any) error {
+	data, err := json.MarshalIndent(value, "", "  ")
+	if err != nil {
+		return err
+	}
+	return writeFileAtomic(path, data)
+}
+
+func writeFileAtomic(path string, data []byte) error {
+	dir := filepath.Dir(path)
+	if err := os.MkdirAll(dir, 0o755); err != nil {
+		return err
 	}
 
-	return depots, nil
+	tmp, err := os.CreateTemp(dir, filepath.Base(path)+".*.tmp")
+	if err != nil {
+		return err
+	}
+	defer os.Remove(tmp.Name())
+
+	if _, err = tmp.Write(data); err != nil {
+		tmp.Close()
+		return err
+	}
+	if err = tmp.Close(); err != nil {
+		return err
+	}
+	if err = os.Chmod(tmp.Name(), 0o644); err != nil {
+		return err
+	}
+
+	return os.Rename(tmp.Name(), path)
 }

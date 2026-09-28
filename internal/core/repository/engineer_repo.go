@@ -1,248 +1,180 @@
 package repository
 
 import (
+	"bytes"
 	"context"
 	"encoding/csv"
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/kr0uch/beeline-plan-tasks/internal/core/models/entities"
 	"github.com/kr0uch/beeline-plan-tasks/pkg/errors"
 )
 
-type EngineerRepository interface {
-	ParseEngineersFromCSV(
-		ctx context.Context,
-		reader io.Reader,
-	) ([]*entities.Engineer, error)
-	ParseEngineersFromCSVByRegion(
-		ctx context.Context,
-		region string,
-	) ([]*entities.Engineer, error)
-	GetEngineersMapByIDAndRegion(
-		ctx context.Context,
-		region string,
-	) (map[string]*entities.Engineer, error)
-	SaveEngineersToCSVByRegion(
-		ctx context.Context,
-		region string,
-		engineers []*entities.Engineer,
-	) error
+const shiftTimeLayout = "15:04"
+
+var engineersCSVHeader = []string{
+	"ID", "ФИО/Бригада", "Навыки", "Оборудование",
+	"Транспорт", "Начало смены", "Конец смены",
+	"Адрес", "Широта", "Долгота",
 }
 
-type engineerRepo struct {
-	engineersDirectory string
+var requiredEngineerColumns = []string{
+	"ID", "ФИО/Бригада", "Навыки", "Оборудование",
+	"Начало смены", "Конец смены", "Адрес",
 }
 
-func NewEngineerRepository(
-	engineersDirectory string,
-) EngineerRepository {
-	return &engineerRepo{
-		engineersDirectory: fmt.Sprintf("%sengineers_%%s.csv", engineersDirectory),
-	}
+type EngineerRepo struct {
+	engineersDir string
 }
 
-func (r *engineerRepo) ParseEngineersFromCSVByRegion(
+func NewEngineerRepository(engineersDir string) *EngineerRepo {
+	return &EngineerRepo{engineersDir: engineersDir}
+}
+
+func (r *EngineerRepo) filePath(region string) string {
+	return filepath.Join(r.engineersDir, fmt.Sprintf("engineers_%s.csv", region))
+}
+
+func (r *EngineerRepo) ParseEngineersFromCSVByRegion(
 	ctx context.Context,
 	region string,
 ) ([]*entities.Engineer, error) {
 
-	filePath := fmt.Sprintf(r.engineersDirectory, region)
-
-	file, err := os.Open(filePath)
+	file, err := os.Open(r.filePath(region))
+	if os.IsNotExist(err) {
+		return nil, errors.ErrRegionNotFound
+	}
 	if err != nil {
-		return nil, errors.ErrFailedOpenCSV(err.Error())
+		return nil, errors.ErrOpenEngineersCSV(err.Error())
 	}
 	defer file.Close()
 
 	return r.ParseEngineersFromCSV(ctx, file)
 }
 
-func (r *engineerRepo) ParseEngineersFromCSV(
+func (r *EngineerRepo) ParseEngineersFromCSV(
 	ctx context.Context,
 	reader io.Reader,
 ) ([]*entities.Engineer, error) {
 
-	csvReader := csv.NewReader(reader)
-	csvReader.Comma = ';'
-	csvReader.FieldsPerRecord = -1
-
-	header, err := csvReader.Read()
+	rows, err := newCSVRows(reader)
 	if err != nil {
 		return nil, errors.ErrInvalidEngineersCSVHeaders(err.Error())
 	}
-
-	colIndex := make(map[string]int)
-	for i, col := range header {
-		colIndex[strings.TrimSpace(col)] = i
+	if missing := rows.missingColumns(requiredEngineerColumns); len(missing) > 0 {
+		return nil, errors.ErrInvalidEngineersCSVHeaders("missing: " + strings.Join(missing, ", "))
 	}
 
 	var engineers []*entities.Engineer
-
 	for {
-		record, err := csvReader.Read()
+		row, err := rows.next()
 		if err == io.EOF {
 			break
 		}
 		if err != nil {
-			return nil, errors.ErrInvalidCSVRow(err.Error())
+			return nil, errors.ErrInvalidEngineerRow(err.Error())
 		}
-
-		if len(record) == 0 || record[0] == "" {
+		if row.get("ID") == "" {
 			continue
 		}
 
-		shiftStart := parseHMToMinutes(getCol(record, colIndex, "Начало смены"))
-		shiftEnd := parseHMToMinutes(getCol(record, colIndex, "Конец смены"))
-
-		depotLat, _ := strconv.ParseFloat(getCol(record, colIndex, "Широта"), 64)
-		depotLon, _ := strconv.ParseFloat(getCol(record, colIndex, "Долгота"), 64)
-
-		depotAddress := getCol(record, colIndex, "Адрес")
-
-		skills := splitList[entities.Skill](getCol(record, colIndex, "Навыки"))
-		equipment := splitList[entities.Equipment](getCol(record, colIndex, "Оборудование"))
-
-		eng := &entities.Engineer{
-			ID:           getCol(record, colIndex, "ID"),
-			Name:         getCol(record, colIndex, "ФИО/Бригада"),
-			Skills:       skills,
-			Equipment:    equipment,
-			Transport:    getCol(record, colIndex, "Транспорт"),
-			ShiftStart:   shiftStart,
-			ShiftEnd:     shiftEnd,
-			DepotAddress: depotAddress,
-			DepotLat:     depotLat,
-			DepotLon:     depotLon,
+		eng, err := parseEngineerRow(row)
+		if err != nil {
+			return nil, err
 		}
-
 		engineers = append(engineers, eng)
 	}
 
 	return engineers, nil
 }
 
-func (r *engineerRepo) GetEngineersMapByIDAndRegion(
-	ctx context.Context,
-	region string,
-) (map[string]*entities.Engineer, error) {
-	engineers, err := r.ParseEngineersFromCSVByRegion(
-		ctx,
-		region,
-	)
+func parseEngineerRow(row csvRow) (*entities.Engineer, error) {
+	shiftStart, err := parseClockToMinutes(row.get("Начало смены"), shiftTimeLayout)
 	if err != nil {
-		return nil, err
+		return nil, errors.ErrInvalidEngineerRow(row.errorf("invalid shift start %q", row.get("Начало смены")))
 	}
 
-	resultMap := make(map[string]*entities.Engineer)
-
-	for _, engineer := range engineers {
-		resultMap[engineer.ID] = engineer
+	shiftEnd, err := parseClockToMinutes(row.get("Конец смены"), shiftTimeLayout)
+	if err != nil {
+		return nil, errors.ErrInvalidEngineerRow(row.errorf("invalid shift end %q", row.get("Конец смены")))
 	}
 
-	return resultMap, nil
+	depotLat, _ := strconv.ParseFloat(row.get("Широта"), 64)
+	depotLon, _ := strconv.ParseFloat(row.get("Долгота"), 64)
 
+	return &entities.Engineer{
+		ID:           row.get("ID"),
+		Name:         row.get("ФИО/Бригада"),
+		Skills:       splitList[entities.Skill](row.get("Навыки")),
+		Equipment:    splitList[entities.Equipment](row.get("Оборудование")),
+		Transport:    row.get("Транспорт"),
+		ShiftStart:   shiftStart,
+		ShiftEnd:     shiftEnd,
+		DepotAddress: row.get("Адрес"),
+		DepotLat:     depotLat,
+		DepotLon:     depotLon,
+	}, nil
 }
 
-func (r *engineerRepo) SaveEngineersToCSVByRegion(
+func (r *EngineerRepo) SaveEngineersToCSVByRegion(
 	ctx context.Context,
 	region string,
 	engineers []*entities.Engineer,
 ) error {
-	filePath := fmt.Sprintf(r.engineersDirectory, region)
 
-	file, err := os.Create(filePath)
-	if err != nil {
-		return errors.ErrFailedOpenCSV(err.Error())
-	}
-	defer file.Close()
+	var buf bytes.Buffer
+	writer := csv.NewWriter(&buf)
+	writer.Comma = csvSeparator
 
-	writer := csv.NewWriter(file)
-	writer.Comma = ';'
-	defer writer.Flush()
-
-	header := []string{
-		"ID", "ФИО/Бригада", "Навыки", "Оборудование",
-		"Транспорт", "Начало смены", "Конец смены",
-		"Адрес", "Широта", "Долгота",
-	}
-	if err := writer.Write(header); err != nil {
+	if err := writer.Write(engineersCSVHeader); err != nil {
 		return err
 	}
 
 	for _, eng := range engineers {
-		skillsStr := joinData(eng.Skills)
-		equipmentStr := joinData(eng.Equipment)
-		shiftStartStr := formatMinutesToHM(eng.ShiftStart)
-		shiftEndStr := formatMinutesToHM(eng.ShiftEnd)
-
 		record := []string{
 			eng.ID,
 			eng.Name,
-			skillsStr,
-			equipmentStr,
+			joinList(eng.Skills),
+			joinList(eng.Equipment),
 			eng.Transport,
-			shiftStartStr,
-			shiftEndStr,
+			formatMinutesToHM(eng.ShiftStart),
+			formatMinutesToHM(eng.ShiftEnd),
 			eng.DepotAddress,
-			fmt.Sprintf("%.6f", eng.DepotLat),
-			fmt.Sprintf("%.6f", eng.DepotLon),
+			strconv.FormatFloat(eng.DepotLat, 'f', 6, 64),
+			strconv.FormatFloat(eng.DepotLon, 'f', 6, 64),
 		}
-
 		if err := writer.Write(record); err != nil {
 			return err
 		}
 	}
 
-	return nil
-}
-
-func formatMinutesToHM(totalMinutes int) string {
-	hours := totalMinutes / 60
-	minutes := totalMinutes % 60
-	return fmt.Sprintf("%02d:%02d", hours, minutes)
-}
-
-func joinData[T entities.Skill | entities.Equipment](data []T) string {
-	strData := make([]string, len(data))
-	for i, s := range data {
-		strData[i] = string(s)
-	}
-	return strings.Join(strData, ", ")
-}
-
-func parseHMToMinutes(timeStr string) int {
-
-	layout := "15:04"
-	t, err := time.Parse(layout, strings.TrimSpace(timeStr))
-	if err != nil {
-		return defaultStartTime
+	writer.Flush()
+	if err := writer.Error(); err != nil {
+		return err
 	}
 
-	totalMinutes := t.Hour()*60 + t.Minute()
-
-	return totalMinutes
+	return writeFileAtomic(r.filePath(region), buf.Bytes())
 }
 
-func splitList[T entities.Skill | entities.Equipment](str string) []T {
-
-	if str == "" {
-		return []T{}
+func joinList[T ~string](items []T) string {
+	parts := make([]string, len(items))
+	for i, item := range items {
+		parts[i] = string(item)
 	}
+	return strings.Join(parts, ", ")
+}
 
-	items := strings.Split(str, ",")
-
-	var result []T
-	for _, item := range items {
-		trimmed := strings.TrimSpace(item)
-		if trimmed != "" {
+func splitList[T ~string](value string) []T {
+	result := make([]T, 0)
+	for _, item := range strings.Split(value, ",") {
+		if trimmed := strings.TrimSpace(item); trimmed != "" {
 			result = append(result, T(trimmed))
 		}
 	}
-
 	return result
 }

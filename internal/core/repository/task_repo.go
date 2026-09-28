@@ -2,32 +2,38 @@ package repository
 
 import (
 	"context"
-	"encoding/csv"
 	"io"
+	"slices"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/kr0uch/beeline-plan-tasks/internal/core/models/entities"
 	"github.com/kr0uch/beeline-plan-tasks/pkg/errors"
 )
 
+const taskTimeLayout = "02.01.2006 15:04"
+
+var requiredTaskColumns = []string{"Заявка", "Начало", "Окончание", "Адрес"}
+
 const (
+	durationDefaultBase  = 60
 	durationGigabitBonus = 30
 	durationFTTBBonus    = 15
 	durationMin          = 25
 	durationMax          = 180
-	defaultBaseDuration  = 60
 )
 
-var durationPriors = map[string]int{
-	"подключение":         60,
-	"дозаказ":             45,
-	"локальная заявка":    30,
-	"локальная":           30,
-	"глобальная проблема": 60,
-	"глобальная":          60,
+var durationBaseByBK = []struct {
+	marker  string
+	minutes int
+}{
+	{"дозаказ", 45},
+	{"локальн", 30},
+	{"глобальн", 60},
+	{"подключени", 60},
+}
 
+var durationModifierByHD = map[string]int{
 	"конвергенция абонента":                  0,
 	"заявка на подключение":                  -10,
 	"заказ подключения/дозаказ оборудования": 15,
@@ -48,253 +54,191 @@ var durationPriors = map[string]int{
 	"авария":                                  40,
 }
 
-type TaskRepository interface {
-	ParseTasksFromCSV(
-		ctx context.Context,
-		reader io.Reader,
-	) ([]*entities.Task, error)
+type TaskRepo struct{}
+
+func NewTaskRepository() *TaskRepo {
+	return &TaskRepo{}
 }
 
-type taskRepo struct{}
-
-func NewTaskRepository() TaskRepository {
-	return &taskRepo{}
-}
-
-func (r *taskRepo) ParseTasksFromCSV(
+func (r *TaskRepo) ParseTasksFromCSV(
 	ctx context.Context,
 	reader io.Reader,
 ) ([]*entities.Task, error) {
 
-	csvReader := csv.NewReader(reader)
-	csvReader.Comma = ';'
-	csvReader.FieldsPerRecord = -1
-
-	header, err := csvReader.Read()
+	rows, err := newCSVRows(reader)
 	if err != nil {
-		return nil, errors.ErrInvalidCSVHeaders
+		return nil, errors.ErrInvalidTasksCSVHeader(err.Error())
 	}
-
-	colIndex := make(map[string]int)
-	for i, col := range header {
-		colIndex[strings.TrimSpace(col)] = i
+	if missing := rows.missingColumns(requiredTaskColumns); len(missing) > 0 {
+		return nil, errors.ErrInvalidTasksCSVHeader("missing: " + strings.Join(missing, ", "))
 	}
 
 	var tasks []*entities.Task
-
 	for {
-		record, err := csvReader.Read()
+		row, err := rows.next()
 		if err == io.EOF {
 			break
 		}
 		if err != nil {
-			return nil, errors.ErrInvalidCSVRow(err.Error())
+			return nil, errors.ErrInvalidTaskRow(err.Error())
 		}
 
-		if len(record) == 0 || record[0] == "" {
-			continue
-		}
-
-		taskID, err := strconv.Atoi(strings.TrimSpace(getCol(record, colIndex, "Заявка")))
+		task, err := parseTaskRow(row)
 		if err != nil {
-			continue
+			return nil, err
 		}
-
-		twStartMin := parseTimeToMinutes(getCol(record, colIndex, "Начало"))
-		twEndMin := parseTimeToMinutes(getCol(record, colIndex, "Окончание"))
-
-		typeBK := getCol(record, colIndex, "Тип заявки BK")
-		typeHD := getCol(record, colIndex, "Тип заявки HD")
-		connection := getCol(record, colIndex, "Подключение")
-		gigabit := getCol(record, colIndex, "Гигабитное подключение")
-		district := getCol(record, colIndex, "Район")
-
-		task := &entities.Task{
-			ID:                taskID,
-			TypeBK:            typeBK,
-			TypeHD:            typeHD,
-			District:          getCol(record, colIndex, "Район"),
-			Address:           getCol(record, colIndex, "Адрес"),
-			TWStart:           twStartMin,
-			TWEnd:             twEndMin,
-			ServiceTime:       calculateServiceTime(typeBK, typeHD, connection),
-			RequiredSkills:    extractSkills(typeBK, typeHD, connection, gigabit),
-			RequiredEquipment: extractEquipments(typeBK, typeHD, connection, gigabit, district),
+		if task != nil {
+			tasks = append(tasks, task)
 		}
-
-		tasks = append(tasks, task)
+	}
+	if len(tasks) == 0 {
+		return nil, errors.ErrNoTasksInCSV
 	}
 
 	return tasks, nil
 }
 
-func getCol(
-	record []string,
-	colIndex map[string]int,
-	colName string,
-) string {
-
-	idx, ok := colIndex[colName]
-	if !ok || idx >= len(record) {
-		return ""
-	}
-
-	return strings.TrimSpace(record[idx])
-}
-
-const defaultStartTime = 540
-
-func parseTimeToMinutes(timeStr string) int {
-	layout := "02.01.2006 15:04"
-	t, err := time.Parse(layout, timeStr)
+func parseTaskRow(row csvRow) (*entities.Task, error) {
+	id, err := strconv.Atoi(row.get("Заявка"))
 	if err != nil {
-		return defaultStartTime
+		return nil, nil
 	}
 
-	return t.Hour()*60 + t.Minute()
+	twStart, err := parseClockToMinutes(row.get("Начало"), taskTimeLayout)
+	if err != nil {
+		return nil, errors.ErrInvalidTaskRow(row.errorf("invalid window start %q", row.get("Начало")))
+	}
+
+	twEnd, err := parseClockToMinutes(row.get("Окончание"), taskTimeLayout)
+	if err != nil {
+		return nil, errors.ErrInvalidTaskRow(row.errorf("invalid window end %q", row.get("Окончание")))
+	}
+
+	attrs := newTaskAttributes(
+		row.get("Тип заявки BK"),
+		row.get("Тип заявки HD"),
+		row.get("Подключение"),
+		row.get("Гигабитное подключение"),
+		row.get("Район"),
+	)
+
+	skills := attrs.requiredSkills()
+	equipment := attrs.requiredEquipment()
+
+	return &entities.Task{
+		ID:                id,
+		TypeBK:            row.get("Тип заявки BK"),
+		TypeHD:            row.get("Тип заявки HD"),
+		District:          row.get("Район"),
+		Address:           row.get("Адрес"),
+		TWStart:           twStart,
+		TWEnd:             twEnd,
+		ServiceTime:       attrs.serviceTime(skills, equipment),
+		RequiredSkills:    skills,
+		RequiredEquipment: equipment,
+	}, nil
 }
 
-func extractEquipments(typeBK, typeHD, connection, gigabit, district string) []entities.Equipment {
-	equipSet := make(map[entities.Equipment]bool)
-
-	bkLower := strings.ToLower(strings.TrimSpace(typeBK))
-	hdLower := strings.ToLower(strings.TrimSpace(typeHD))
-	connLower := strings.ToLower(strings.TrimSpace(connection))
-	gigabitLower := strings.ToLower(strings.TrimSpace(gigabit))
-	districtLower := strings.ToLower(strings.TrimSpace(district))
-
-	if bkLower == "подключение" ||
-		strings.Contains(hdLower, "роутер") ||
-		strings.Contains(hdLower, "дозаказ") {
-		equipSet[entities.RouterEq] = true
-	}
-
-	if connLower == "fmc" ||
-		strings.Contains(hdLower, "конвергенция") ||
-		strings.Contains(hdLower, "тв") ||
-		strings.Contains(hdLower, "tve") ||
-		strings.Contains(hdLower, "ent") {
-		equipSet[entities.TvBoxEq] = true
-	}
-
-	if gigabitLower == "да" || strings.Contains(hdLower, "гбит") {
-		equipSet[entities.GigabitKitEq] = true
-	}
-
-	if strings.Contains(districtLower, "gpon") ||
-		strings.Contains(connLower, "gpon") ||
-		strings.Contains(connLower, "pon") ||
-		strings.Contains(connLower, "оптик") {
-		equipSet[entities.OpticsKitEq] = true
-	}
-
-	if connLower == "fttb" ||
-		bkLower == "подключение" ||
-		bkLower == "локальная заявка" ||
-		bkLower == "глобальная проблема" ||
-		strings.Contains(hdLower, "кабел") ||
-		strings.Contains(hdLower, "линк") ||
-		strings.Contains(hdLower, "разрыв") ||
-		strings.Contains(hdLower, "авария") ||
-		strings.Contains(hdLower, "ошибок") ||
-		strings.Contains(hdLower, "скорость") ||
-		strings.Contains(hdLower, "169") {
-		equipSet[entities.CableKitEq] = true
-	}
-
-	equipments := make([]entities.Equipment, 0, len(equipSet))
-	for eq := range equipSet {
-		equipments = append(equipments, eq)
-	}
-
-	return equipments
+type taskAttributes struct {
+	typeBK     string
+	typeHD     string
+	connection string
+	gigabit    bool
+	district   string
 }
 
-func extractSkills(typeBK, typeHD, connection, gigabit string) []entities.Skill {
-	skillSet := map[entities.Skill]bool{
-		entities.BasicSkill: true,
+func newTaskAttributes(typeBK, typeHD, connection, gigabit, district string) taskAttributes {
+	return taskAttributes{
+		typeBK:     strings.ToLower(typeBK),
+		typeHD:     strings.ToLower(typeHD),
+		connection: strings.ToLower(connection),
+		gigabit:    strings.EqualFold(gigabit, "да") || strings.Contains(strings.ToLower(typeHD), "гбит"),
+		district:   strings.ToLower(district),
 	}
+}
 
-	bkLower := strings.ToLower(strings.TrimSpace(typeBK))
-	hdLower := strings.ToLower(strings.TrimSpace(typeHD))
-	connLower := strings.ToLower(strings.TrimSpace(connection))
-	gigabitLower := strings.ToLower(strings.TrimSpace(gigabit))
+func (a taskAttributes) hdContainsAny(markers ...string) bool {
+	return slices.ContainsFunc(markers, func(m string) bool {
+		return strings.Contains(a.typeHD, m)
+	})
+}
 
-	if connLower == "fmc" || strings.Contains(hdLower, "конвергенция") {
-		skillSet[entities.FMCSkill] = true
+func (a taskAttributes) requiredSkills() []entities.Skill {
+	skills := []entities.Skill{entities.BasicSkill}
+
+	if a.connection == "fmc" || a.hdContainsAny("конвергенция") {
+		skills = append(skills, entities.FMCSkill)
 	}
-
-	if strings.Contains(bkLower, "глобальн") || strings.Contains(hdLower, "авария") {
-		skillSet[entities.EmergencySkill] = true
+	if strings.Contains(a.typeBK, "глобальн") || a.hdContainsAny("авария") {
+		skills = append(skills, entities.EmergencySkill)
 	}
-
-	if gigabitLower == "да" || strings.Contains(hdLower, "гбит") {
-		skillSet[entities.GigabitSkill] = true
+	if a.gigabit {
+		skills = append(skills, entities.GigabitSkill)
 	}
-
-	if connLower == "fttb" {
-		skillSet[entities.FTTBSkill] = true
-	}
-
-	skills := make([]entities.Skill, 0, len(skillSet))
-	for s := range skillSet {
-		skills = append(skills, s)
+	if a.connection == "fttb" {
+		skills = append(skills, entities.FTTBSkill)
 	}
 
 	return skills
 }
 
-func calculateServiceTime(typeBK, typeHD, connection string) int {
-	bkLower := strings.ToLower(strings.TrimSpace(typeBK))
-	hdLower := strings.ToLower(strings.TrimSpace(typeHD))
-	connLower := strings.ToLower(strings.TrimSpace(connection))
+func (a taskAttributes) requiredEquipment() []entities.Equipment {
+	equipment := make([]entities.Equipment, 0)
 
-	base := defaultBaseDuration
-	switch {
-	case strings.Contains(bkLower, "дозаказ"):
-		base = durationPriors["дозаказ"]
-	case strings.Contains(bkLower, "локальн"):
-		base = durationPriors["локальная"]
-	case strings.Contains(bkLower, "глобальн"):
-		base = durationPriors["глобальная"]
-	case strings.Contains(bkLower, "подключени"):
-		base = durationPriors["подключение"]
-	default:
-		if val, ok := durationPriors[bkLower]; ok {
-			base = val
+	if a.typeBK == "подключение" || a.hdContainsAny("роутер", "дозаказ") {
+		equipment = append(equipment, entities.RouterEq)
+	}
+
+	if a.connection == "fmc" || a.hdContainsAny("конвергенция", "тв", "tve", "ent") {
+		equipment = append(equipment, entities.TvBoxEq)
+	}
+
+	if a.gigabit {
+		equipment = append(equipment, entities.GigabitKitEq)
+	}
+
+	if strings.Contains(a.district, "gpon") ||
+		strings.Contains(a.connection, "pon") ||
+		strings.Contains(a.connection, "оптик") {
+		equipment = append(equipment, entities.OpticsKitEq)
+	}
+
+	if a.connection == "fttb" ||
+		a.typeBK == "подключение" ||
+		a.typeBK == "локальная заявка" ||
+		a.typeBK == "глобальная проблема" ||
+		a.hdContainsAny("кабел", "линк", "разрыв", "авария", "ошибок", "скорость", "169") {
+		equipment = append(equipment, entities.CableKitEq)
+	}
+
+	return equipment
+}
+
+func (a taskAttributes) serviceTime(
+	skills []entities.Skill,
+	equipment []entities.Equipment,
+) int {
+
+	total := durationDefaultBase
+	for _, base := range durationBaseByBK {
+		if strings.Contains(a.typeBK, base.marker) {
+			total = base.minutes
+			break
 		}
 	}
 
-	modifier := 0
-	for key, val := range durationPriors {
-		if key == "подключение" || key == "дозаказ" ||
-			key == "локальная" || key == "локальная заявка" ||
-			key == "глобальная" || key == "глобальная проблема" {
-			continue
-		}
-		if strings.Contains(hdLower, key) {
-			modifier += val
+	for marker, minutes := range durationModifierByHD {
+		if strings.Contains(a.typeHD, marker) {
+			total += minutes
 		}
 	}
 
-	bonuses := 0
-	if strings.Contains(connLower, "гбит") || strings.Contains(connLower, "gigabit") ||
-		strings.Contains(hdLower, "гбит") || strings.Contains(hdLower, "gigabit") {
-		bonuses += durationGigabitBonus
+	if slices.Contains(equipment, entities.GigabitKitEq) {
+		total += durationGigabitBonus
+	}
+	if slices.Contains(skills, entities.FTTBSkill) {
+		total += durationFTTBBonus
 	}
 
-	if strings.Contains(connLower, "fttb") || strings.Contains(connLower, "фттб") {
-		bonuses += durationFTTBBonus
-	}
-
-	total := base + modifier + bonuses
-
-	if total < durationMin {
-		return durationMin
-	}
-	if total > durationMax {
-		return durationMax
-	}
-
-	return total
+	return min(max(total, durationMin), durationMax)
 }
