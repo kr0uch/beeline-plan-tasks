@@ -1,4 +1,6 @@
+import { useEffect, useState } from 'react'
 import { NavLink } from 'react-router'
+import { fetchHealth, type Health } from '@/entities/plan'
 import { usePlan } from '@/features/load-plan'
 import { cn } from '@/shared/lib'
 import { Icon } from '@/shared/ui'
@@ -44,8 +46,27 @@ function NavSection({ title, items }: { title: string; items: NavItem[] }) {
   )
 }
 
+function useHealth() {
+  const [health, setHealth] = useState<Health | null | 'down'>(null)
+  useEffect(() => {
+    const check = () =>
+      fetchHealth()
+        .then(setHealth)
+        .catch(() => setHealth('down'))
+    check()
+    const id = setInterval(check, 30_000)
+    return () => clearInterval(id)
+  }, [])
+  return health
+}
+
 export function AppSidebar() {
   const { plan, view } = usePlan()
+  const health = useHealth()
+  const apiUp = health !== null && health !== 'down'
+  const mlUp = apiUp && /^(ok|up|available|healthy)$/i.test(health.ml)
+  const tone = health === null ? 'bg-text-muted' : !apiUp ? 'bg-signal-danger' : mlUp ? 'bg-signal-success' : 'bg-signal-warning'
+  const label = health === null ? 'проверка…' : !apiUp ? 'недоступен' : mlUp ? 'онлайн' : `онлайн, ML: ${health.ml}`
 
   return (
     <aside className="z-50 flex h-full w-60 shrink-0 flex-col justify-between border-r border-border bg-bg-surface select-none">
@@ -82,11 +103,11 @@ export function AppSidebar() {
 
       <div className="flex items-center gap-1.5 border-t border-border bg-bg-subtle p-3">
         <span className="relative flex size-2">
-          <span className="absolute inline-flex size-full animate-ping rounded-full bg-signal-success opacity-75" />
-          <span className="relative inline-flex size-2 rounded-full bg-signal-success" />
+          <span className={cn('absolute inline-flex size-full animate-ping rounded-full opacity-75', tone)} />
+          <span className={cn('relative inline-flex size-2 rounded-full', tone)} />
         </span>
         <span className="truncate text-label-sm text-text-secondary">
-          API: <strong className="font-medium text-signal-success">/api/v1</strong>
+          Сервер: <strong className={cn('font-medium', apiUp ? (mlUp ? 'text-signal-success' : 'text-signal-warning') : 'text-signal-danger')}>{label}</strong>
         </span>
       </div>
     </aside>

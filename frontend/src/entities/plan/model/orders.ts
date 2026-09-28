@@ -89,13 +89,13 @@ export function buildOrders(view: PlanView, now: number): Order[] {
   const unassigned = view.unassigned.map(
     (u): Order => ({
       id: u.task_id,
-      task: null,
+      task: u.task ?? null,
       assignment: null,
       unassigned: u,
       crew: null,
       position: null,
-      kind: null,
-      source: null,
+      kind: u.task ? getTaskKind(u.task) : null,
+      source: u.task ? orderSource(u.task) : null,
       critical: false,
       status: 'unassigned',
       risk: 'unassigned',

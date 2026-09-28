@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
-import { buildPlanView, createPlan, mockPlan, replanPlan, simulateReplan, type PlanResponse, type Task } from '@/entities/plan'
+import { buildPlanView, createPlan, fetchCurrentPlan, mockPlan, replanPlan, simulateReplan, type PlanResponse, type Task } from '@/entities/plan'
 import { nowDayMin } from '@/shared/lib'
 import { PLAN_TIME_ORIGIN_MIN, type Region } from '@/shared/config'
 import { PlanContext, type PlanState } from './context'
@@ -85,6 +85,19 @@ export function PlanProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     stateRef.current = state
   }, [state])
+
+  useEffect(() => {
+    if (stateRef.current.isDemo || stateRef.current.status === 'loading') return
+    const controller = new AbortController()
+    fetchCurrentPlan(state.region, controller.signal)
+      .then((plan) => {
+        if (controller.signal.aborted || stateRef.current.isDemo) return
+        if (plan) applyPlan(plan, { isDemo: false, fileName: 'план с сервера', previous: null, replanTask: null })
+        else setState((s) => (s.isDemo || s.status === 'loading' ? s : { ...s, plan: null, view: null, status: 'idle', updatedAt: null }))
+      })
+      .catch(() => undefined)
+    return () => controller.abort()
+  }, [state.region])
 
   const replan = useCallback(async (task: Task) => {
     const current = stateRef.current

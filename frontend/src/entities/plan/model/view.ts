@@ -1,3 +1,4 @@
+import { transportLabel } from '../lib/transport'
 import { SHIFT_DURATION_MIN } from '@/shared/config'
 import type { AssignedTask, PlanResponse, Route, Task, UnassignedTask } from './types'
 
@@ -54,7 +55,7 @@ function buildCrew(route: Route, index: number, assignments: Map<number, Assigne
   return {
     id: route.engineer_id,
     name: route.engineer_name,
-    transport: route.transport,
+    transport: transportLabel(route.transport),
     distanceKm: route.distance_km,
     timeMin: route.time_min,
     travelMin: route.travel_time_min ?? null,
