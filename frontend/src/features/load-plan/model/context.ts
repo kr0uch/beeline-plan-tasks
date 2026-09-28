@@ -31,7 +31,7 @@ export type PlanState = {
 
 export type PlanActions = {
   setRegion: (region: Region) => void
-  submit: (file: File, region?: Region) => Promise<void>
+  submit: (file: File, region?: Region) => Promise<boolean>
   recalculate: () => Promise<void>
   loadDemo: () => void
   replan: (task: Task) => Promise<boolean>

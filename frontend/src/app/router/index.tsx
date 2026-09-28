@@ -2,6 +2,7 @@ import { createBrowserRouter, Navigate } from 'react-router'
 import { ReplanPage } from '@/pages/replan'
 import { AnalyticsPage } from '@/pages/analytics'
 import { CrewsPage } from '@/pages/crews'
+import { ImportPage } from '@/pages/import'
 import { OrdersPage } from '@/pages/orders'
 import { PlaceholderPage } from '@/pages/placeholder'
 import { PlanningPage } from '@/pages/planning'
@@ -18,7 +19,7 @@ export const router = createBrowserRouter([
       { path: 'crews', element: <CrewsPage /> },
       { path: 'analytics', element: <AnalyticsPage /> },
       { path: 'settings', element: <PlaceholderPage title="Настройки алгоритма" /> },
-      { path: 'import', element: <PlaceholderPage title="Импорт данных" /> },
+      { path: 'import', element: <ImportPage /> },
       { path: '*', element: <Navigate to="/planning" replace /> },
     ],
   },
