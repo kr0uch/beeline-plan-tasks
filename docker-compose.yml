@@ -13,7 +13,11 @@ services:
       - global-app-network
 
   nginx:
-    image: nginx:alpine
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile.nginx
+    image: beeline_nginx:latest
+    pull_policy: build
     container_name: nginx_container
     restart: unless-stopped
     ports:
