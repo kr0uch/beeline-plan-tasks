@@ -206,7 +206,7 @@ export function AnalyticsPage() {
           title="Средняя утилизация экипажей"
           icon="speed"
           value={`${avgLoad}%`}
-          delta={`σ ${Math.round(ml.load_std)} мин`}
+          delta={`σ ${ml.load_std.toFixed(1)} заявки`}
           good={ml.load_std <= base.load_std}
           note={`${overloaded} ${plural(overloaded, 'бригада', 'бригады', 'бригад')} с загрузкой выше 90%`}
         />
@@ -296,7 +296,7 @@ export function AnalyticsPage() {
         <Card
           title={`Распределение дневной нагрузки по ${view.crews.length} ${plural(view.crews.length, 'бригаде', 'бригадам', 'бригадам')}`}
           subtitle="Работа, дорога и ожидание окна относительно смены"
-          aside={<Badge className="bg-bg-subtle text-text-secondary border border-border">σ {Math.round(ml.load_std)} мин</Badge>}
+          aside={<Badge className="bg-bg-subtle text-text-secondary border border-border">σ {ml.load_std.toFixed(1)} заявки</Badge>}
         >
           <div className="mb-2 flex gap-3 text-label-sm text-text-secondary">
             <span className="flex items-center gap-1"><span className="size-2 rounded-sm bg-primary" />Работа</span>
