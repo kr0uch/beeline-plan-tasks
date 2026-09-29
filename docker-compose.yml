@@ -1,0 +1,51 @@
+services:
+  beeline_server:
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile
+    image: beeline_server:latest
+    container_name: beeline_server
+    restart: unless-stopped
+    volumes:
+      - .yaml:/app/.yaml
+      - ./data:/app/data
+    networks:
+      - global-app-network
+    depends_on:
+      ml-solver:
+        condition: service_healthy
+
+  ml-solver:
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile.ml
+    image: hackathon-routes-ml-solver:latest
+    container_name: ml-solver
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+    networks:
+      - global-app-network
+
+  nginx:
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile.nginx
+    image: beeline_nginx:latest
+    pull_policy: build
+    container_name: nginx_container
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - global-app-network
+    depends_on:
+      beeline_server:
+        condition: service_healthy
+
+
+networks:
+  global-app-network:
+    external: true

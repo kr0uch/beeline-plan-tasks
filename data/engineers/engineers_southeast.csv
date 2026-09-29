@@ -1,0 +1,13 @@
+ID;ФИО/Бригада;Навыки;Оборудование;Транспорт;Начало смены;Конец смены;Адрес;Широта;Долгота
+eng_00;Паршин;basic, emergency, fmc;router, tv_box, cable_kit, optics_kit;car;09:00;22:00;Домодедово;55.4405;37.7555
+eng_01;Андреев;basic, emergency, fmc;router, tv_box, cable_kit, optics_kit;car;09:00;22:00;г. Москва, ул Бирюлёвская, д 1с1;55.5876;37.6572
+eng_02;Белоновский;basic, emergency, fmc, gigabit;router, tv_box, cable_kit, optics_kit, gigabit_kit;car;09:00;22:00;г. Москва, ул Бирюлёвская, д 1с1;55.5876;37.6572
+eng_03;Рыбин;basic, emergency, fmc, gigabit;router, tv_box, cable_kit, optics_kit, gigabit_kit;car;09:00;22:00;г. Москва, ул Бирюлёвская, д 1с1;55.5876;37.6572
+eng_04;Горбанев;basic, emergency, fmc;router, tv_box, cable_kit, optics_kit;car;09:00;22:00;г. Москва, ул Бирюлёвская, д 1с1;55.5876;37.6572
+eng_05;Бузань;basic, emergency, fmc;router, tv_box, cable_kit, optics_kit;car;09:00;22:00;г. Москва, ул Бирюлёвская, д 1с1;55.5876;37.6572
+eng_06;Козырь;basic, emergency, fmc;router, tv_box, cable_kit, optics_kit;car;09:00;22:00;Ступино;54.8975;38.0785
+eng_07;Саламатин;basic, emergency, fmc;router, tv_box, cable_kit, optics_kit;car;09:00;22:00;Кашира;54.8335;38.1665
+eng_08;Макаров;basic, emergency, fmc, fttb;router, tv_box, cable_kit, optics_kit;car;09:00;22:00;г. Москва, ул Бирюлёвская, д 1с1;55.5876;37.6572
+eng_09;Каушнян;basic, emergency, fmc;router, tv_box, cable_kit, optics_kit;car;09:00;22:00;г. Москва, ул Бирюлёвская, д 1с1;55.5876;37.6572
+eng_10;Царьков;basic, emergency;router, tv_box, cable_kit, optics_kit;car;09:00;22:00;г. Москва, ул Бирюлёвская, д 1с1;55.5876;37.6572
+eng_11;Демин;basic, emergency;router, tv_box, cable_kit, optics_kit;car;09:00;22:00;г. Москва, ул Бирюлёвская, д 1с1;55.5876;37.6572

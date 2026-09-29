@@ -1,121 +1,146 @@
-# hackathon-routes
+# Beeline VRP Distribution API
 
-интеллектуальный сервис планирования маршрутов выездных инженеров. vrptw с приоритетами, soft time windows, мультидепо, replan и llm-дайджест.
+REST API сервис на Go для решения задачи маршрутизации транспорта (Vehicle Routing Problem - VRP). Сервис работает в связке с внешним ML-решателем, использует гео-сервисы (Geoapify), интеллектуальную обработку (Groq) и скрыт за Nginx с настроенным rate-limit.
 
-## что умеет
+## 🏗 Архитектура и как это работает
 
-- распределяет заявки между инженерами по навыкам и оборудованию
-- учитывает временные окна и sla
-- минимизирует время в пути и опоздания
-- поддерживает несколько депо (москва + подмосковье)
-- пересчитывает день при поступлении новой заявки с фиксацией начатых
-- показывает причины выбора маршрута
-- отдаёт geojson для карты
+Была построена микросервисная архитектура, где Go-приложение выступает главным оркестратором:
 
-## стек
+1. **`beeline_server` (Go):** Основной бэкенд. Принимает HTTP-запросы, читает расписания инженеров из локальных файлов (`/data/engineers/`), проверяет наличие готовых маршрутов в умном кэше (`/data/cache/`), обогащает данные через внешние API (Geoapify, Groq) и **отправляет подготовленный payload во внешний ML-сервис**. Обратно сервер получает рассчитанные метрики и матрицы маршрутов для сохранения и выдачи клиенту.
+2. **`nginx` (Reverse Proxy):** Стоит перед Go-сервером. Защищает API от спама (ограничение 30 запросов в секунду, burst 50), управляет таймаутами и отдает `502 Bad Gateway`, если бэкенд перегружен.
+3. **Умный файловый кэш:** Система кэширования гео-данных и маршрутов по регионам (например, `east`). Сервис автоматически создает нужные структуры директорий (`os.MkdirAll`), предотвращая падения из-за отсутствующих файлов.
 
-- python 3.11+
-- ortools (vrptw solver)
-- osrm локально (матрица времени/расстояний), fallback на haversine
-- catboost (оценка длительности работ), fallback на priors
-- fastapi + uvicorn
-- leaflet (карта)
+## ⚙️ Требования
 
-## установка
+* **Go** 1.21+
+* **Docker** и **Docker Compose**
+* Утилита **Make**
+* Установленный `swag` (для генерации Swagger документации)
 
+---
+
+## 🛠 Конфигурация
+
+Проект поддерживает два варианта запуска: локальный (для разработки) и Docker (для продакшена).
+Создайте файл `.yaml` в корне проекта на основе нужного примера.
+
+### Для локальной разработки (`example.yaml`)
+
+Используются **относительные пути** к файлам и `localhost`.
+
+```yaml
+server:
+  host: "localhost"
+  port: 8080
+  swagger:
+    host: "localhost:8080"
+    schema: "http"
+
+logger:
+  log_path: "./logs/"
+
+ml_service_url: "http://0.0.0.0:8000" # URL до запущенного локально ML-сервиса
+engineers_data_dir: "./data/engineers/"
+cache_data_dir: "./data/cache/"
+
+geoapify_api_key: "YOUR_API_KEY"
+groq_api_key: "YOUR_API_KEY"
+groq_model: "openai/gpt-oss-120b"
+
+```
+
+### Для Docker среды (`example.docker.yaml`)
+
+Используются **абсолютные пути** внутри контейнера и DNS-имя внешнего ML-сервиса (`ml-solver`).
+
+```yaml
+server:
+  host: "0.0.0.0" # Обязательно 0.0.0.0 для проброса портов в Docker!
+  port: 8080
+  swagger:
+    host: "example.com" # Или IP вашего сервера
+    schema: "http"
+
+logger:
+  log_path: "/app/logs/"
+
+ml_service_url: "http://ml-solver:8000" # Обращение через общую Docker-сеть
+engineers_data_dir: "/app/data/engineers/"
+cache_data_dir: "/app/data/cache/"
+
+geoapify_api_key: "YOUR_API_KEY"
+groq_api_key: "YOUR_API_KEY"
+groq_model: "openai/gpt-oss-120b"
+
+```
+---
+# Можете выбрать любую версию модели, которую передоставляет Groq
+---
+
+## 🚀 Запуск проекта и управление через Make
+
+Для максимального удобства вся работа с проектом (и локально, и в Docker) автоматизирована через `Makefile`.
+
+### Полный список команд Makefile
+
+**Для работы с Docker (продакшен / тесты в изоляции):**
+
+* `make docker-global-network` — создает внешнюю сеть `global-app-network` для связи с ML-сервисом (выполняется один раз).
+* `make docker-build` — собирает Docker-образы проекта.
+* `make docker-up` — запускает контейнеры (`beeline_server` и `nginx`) в фоновом режиме.
+* `make docker-down` — останавливает и удаляет контейнеры проекта.
+* `make docker-restart` — выполняет полную перезагрузку контейнеров (down -> up).
+* `make docker-logs` — выводит логи всех запущенных контейнеров в реальном времени.
+* `make docker-clean` — жесткая очистка (удаляет контейнеры, неиспользуемые тома и чистит кэш Docker).
+
+**Для локальной разработки:**
+
+* `make run` — генерирует Swagger документацию и запускает Go-сервер локально.
+* `make swag` — обновляет документацию и зависимости (`go mod tidy`).
+* `make clean` — удаляет локальный кэш приложения (`data/cache/`), сгенерированную документацию и бинарники.
+
+### Быстрый старт (Docker)
+
+1. Создайте общую сеть для связи микросервисов:
 ```bash
-python -m venv .venv
-.venv\Scripts\activate          # windows
-pip install -r requirements.txt
-```
-osrm (опционально)
-если поднят — матрица считается по реальным дорогам. если нет — haversine с коэффициентом 1.35.
+make docker-global-network
 
+```
+
+
+2. Убедитесь, что ML-сервис запущен и подключен к этой же сети.
+3. Поднимите бэкенд:
 ```bash
-cd docker
-docker compose up -d
-первый запуск требует подготовки дампа osm (см. docker/).
+make docker-up
+
 ```
-запуск
-```bash
-# 1. подготовка данных (задачи + инженеры + геокодинг + duration)
-python scripts/01_prepare_data.py
 
-# 2. (опционально) обучение catboost на slot_duration
-python scripts/02_train_duration.py
 
-# 3. решение vrptw
-python scripts/03_solve.py --region vostok --limit 60
 
-# 4. backtest на контрольной выборке
-python scripts/04_backtest.py
+> Папки с данными (`./data/`) и логи (`./logs/`) будут автоматически примонтированы внутрь контейнера по путям `/app/data/` и `/app/logs/`.
 
-# 5. api + карта
-uvicorn src.api.app:app --reload
-# http://localhost:8000/map/vostok
-```
-формат запроса /plan
-```json
-{
-  "region": "vostok",
-  "tasks": [
-    {
-      "id": 74198,
-      "type_bk": "подключение",
-      "type_hd": "конвергенция абонента",
-      "district": "кузьминки",
-      "address": "город москва, пр-кт.волгоградский, д. 128 к 5",
-      "lat": 55.6945,
-      "lon": 37.7735,
-      "tw_start": 660,
-      "tw_end": 780,
-      "service_time": 90,
-      "priority": "connection",
-      "required_skills": ["basic", "fmc"],
-      "required_equipment": []
-    }
-  ],
-  "engineers": [
-    {
-      "id": "eng_00",
-      "name": "соколов",
-      "skills": ["basic", "emergency", "fmc"],
-      "equipment": ["router", "tv_box", "cable_kit"],
-      "transport": "car",
-      "shift_start": 540,
-      "shift_end": 1320,
-      "depot_lat": 55.6963,
-      "depot_lon": 37.7577
-    }
-  ]
-}
-```
-обязательно у задач: id, type_bk, type_hd, district, address, tw_start, tw_end.
-опционально: lat, lon, service_time, priority, required_skills, required_equipment.
-время — int-минуты от 09:00 (09:00 = 540).
+---
 
-структура
-```text
-src/
-  config.py          конфиг: регионы, приоритеты, штрафы, priors
-  io/                парсинг csv
-  geo/               геокодинг + матрица
-  ml/                оценка длительности
-  solver/            vrptw + replan + метрики
-  explain/           объяснения + llm-дайджест
-  api/               fastapi
-scripts/             пайплайн
-data/raw/            исходные csv
-data/processed/      готовые планы
-docker/              osrm
-```
-метрики
-assigned_rate — доля назначенных
+## 📡 API и Структура запросов
 
-late_count / total_late_min — опоздания
+Документация автоматически генерируется через Swagger. После запуска сервера она доступна по адресу: `/api/v1/swagger/index.html` (или `/docs/`).
 
-overtime_min — работа после 22:00
+**Базовый URL через Nginx:** `[http://example.com/api/v1/](http://example.com/api/v1/)` (замените example.com на IP\domain вашего сервера)
 
-load_mean / std / max / min — загрузка инженеров
+### Пример основного запроса
 
-total_distance_km / total_time_min / total_travel_min
+Построение плана маршрутов для региона:
+
+* **Эндпоинт:** `POST /api/v1/plan?region=east`
+* **Описание:** Сервис проверяет кэш для региона `east`. Если кэша нет, он парсит файлы инженеров, собирает гео-данные через Geoapify, шлет запрос на вычисление в ML-модель, получает от нее метрики и готовую матрицу маршрутов, после чего сохраняет результат в `data/cache/east/routes_east.json`.
+
+---
+
+## 📝 Логирование (Uber Zap)
+
+В проекте интегрирован логгер **Zap** от Uber — один из самых быстрых и структурированных логгеров для Go.
+
+* **Структурированность:** Логи пишутся в JSON-формате, что идеально для систем сбора логов (ELK, Grafana Loki).
+* **Уровни логирования:** `INFO` (статус HTTP-запросов, факт отправки данных в ML), `ERROR` (ошибки парсинга, таймауты Nginx), `DEBUG` (отладка формирования payload'ов и гео-запросов).
+* **Хранение:** Логи физически сохраняются в директорию, указанную в `logger.log_path` (ротация логов настраивается дополнительно).
+

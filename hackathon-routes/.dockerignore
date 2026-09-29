@@ -1,0 +1,13 @@
+.venv/
+__pycache__/
+*.pyc
+.git
+.gitignore
+.env
+catboost_info/
+data/cache/
+data/processed/
+data/raw/*.pbf
+docker/osrm-data/
+*.md
+scripts/

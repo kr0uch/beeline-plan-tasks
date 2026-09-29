@@ -1,22 +1,28 @@
-# Python
-.venv/
-__pycache__/
-*.pyc
-*.pyo
-*.egg-info/
+# System
+*.log
+*.tmp
 
-# CatBoost артефакты
-catboost_info/
-
-# Данные (большие)
-data/cache/*.npz
-data/raw/*.pbf
-docker/osrm-data/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
 
 # IDE
 .idea/
+*.iml
+*.iws
+.idea/workspace.xml
+.idea/shelf/
 .vscode/
-*.swp
 
-# Env
-.envdiag.py
+# Docker & Database
+data/
+
+# Other
+.yaml
+.env
+.env.local
+.env.*.local
+secrets.xml
+local.*

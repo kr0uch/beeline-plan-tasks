@@ -1,0 +1,22 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+
+# CatBoost артефакты
+catboost_info/
+
+# Данные (большие)
+data/cache/*.npz
+data/raw/*.pbf
+docker/osrm-data/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# Env
+.env

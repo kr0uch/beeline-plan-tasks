@@ -1,0 +1,19 @@
+server:
+  host: "0.0.0.0"
+  port: 8080
+  swagger:
+    host: "0.0.0.0:80"
+    schema: "http"
+
+logger:
+  log_path: "/app/logs/"
+
+ml_service_url: "http://ml-solver:8000"
+engineers_data_dir: "/app/data/engineers/"
+cache_data_dir: "/app/data/cache/"
+
+geoapify_api_key: "YOUR_API_KEY"
+
+groq_api_key: "YOUR_API_KEY"
+groq_model: "openai/gpt-oss-120b"
+
