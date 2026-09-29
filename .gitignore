@@ -19,4 +19,4 @@ docker/osrm-data/
 *.swp
 
 # Env
-.env
+.envdiag.py
