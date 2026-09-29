@@ -57,10 +57,10 @@ HORIZON_MIN = SHIFT_END_MIN - SHIFT_START_MIN
 
 
 PRIORITY_PENALTY = {
-    "emergency": 1_000_000,
-    "connection": 50_000,
-    "local": 10_000,
-    "extra": 5_000,
+    "emergency": 100_000,
+    "connection": 500,
+    "local": 100,
+    "extra": 50,
 }
 
 LATE_PENALTY = {

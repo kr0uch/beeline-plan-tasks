@@ -20,8 +20,7 @@ def _parse_dt(x):
 
 
 def _minutes_from_shift_start(dt: datetime, day_start_hour: int = 9) -> int:
-    base = dt.replace(hour=day_start_hour, minute=0, second=0, microsecond=0)
-    return int((dt - base).total_seconds() // 60)
+    return dt.hour * 60 + dt.minute
 
 
 def _required_skills_and_equipment(row: pd.Series):

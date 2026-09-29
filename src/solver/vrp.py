@@ -61,7 +61,7 @@ def solve_vrp(tasks, engineers, time_matrix, dist_matrix, time_limit_sec=20,
     dist_idx = routing.RegisterTransitCallback(dist_cb)
     routing.SetArcCostEvaluatorOfAllVehicles(time_idx)
 
-    routing.AddDimension(time_idx, 1440, HORIZON_MIN + 900, False, "Time")
+    routing.AddDimension(time_idx, 1440, HORIZON_MIN + 1500, False, "Time")
     time_dim = routing.GetDimensionOrDie("Time")
     time_dim.SetSpanCostCoefficientForAllVehicles(1)
 
@@ -73,7 +73,7 @@ def solve_vrp(tasks, engineers, time_matrix, dist_matrix, time_limit_sec=20,
             cur = current_positions[engineers[v]["id"]]
             shift_start = max(shift_start, cur.get("time_min", shift_start))
         time_dim.CumulVar(s).SetRange(shift_start, shift_start + 60)
-        time_dim.CumulVar(e).SetMax(shift_end + 120)
+        time_dim.CumulVar(e).SetMax(shift_end + 600)
         time_dim.SetCumulVarSoftUpperBound(e, shift_end, 1000)
 
     allowed = _allowed_vehicles(tasks, engineers)
@@ -96,7 +96,7 @@ def solve_vrp(tasks, engineers, time_matrix, dist_matrix, time_limit_sec=20,
 
     params = pywrapcp.DefaultRoutingSearchParameters()
     params.first_solution_strategy = (
-        routing_enums_pb2.FirstSolutionStrategy.PARALLEL_CHEAPEST_INSERTION
+        routing_enums_pb2.FirstSolutionStrategy.PATH_CHEAPEST_ARC
     )
     params.local_search_metaheuristic = (
         routing_enums_pb2.LocalSearchMetaheuristic.GUIDED_LOCAL_SEARCH

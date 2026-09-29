@@ -106,7 +106,8 @@ def _solve_and_respond(tasks, engineers, region_key, time_limit):
 def post_plan(req: PlanRequest):
     tasks = _prepare_tasks(req.tasks)
     engineers = [e.model_dump() for e in req.engineers]
-    limit = (req.options or {}).get("time_limit_sec", 20)
+    default_limit = 45 if len(req.tasks) > 50 else 20
+    limit = (req.options or {}).get("time_limit_sec", default_limit)
     return _solve_and_respond(tasks, engineers, f"api_{req.region}", limit)
 
 
