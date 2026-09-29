@@ -25,6 +25,7 @@ export function MiniRouteMap({ stops, color, emergency, dashed }: Props) {
 
   return (
     <MapContainer
+      key={all.map((p) => p.join(",")).join(";")}
       bounds={L.latLngBounds(all)}
       boundsOptions={{ padding: [28, 28], maxZoom: 14 }}
       zoomControl={false}
