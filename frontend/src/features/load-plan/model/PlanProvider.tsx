@@ -124,7 +124,17 @@ export function PlanProvider({ children }: { children: ReactNode }) {
     if (state.isDemo) loadDemo()
   }, [submit, loadDemo, state.isDemo])
 
-  const setRegion = useCallback((region: Region) => setState((s) => ({ ...s, region })), [])
+  const setRegion = useCallback(
+    (region: Region) =>
+      setState((s) =>
+        s.region === region
+          ? s
+          : s.isDemo
+            ? { ...s, region, isDemo: false, plan: null, view: null, fileName: null, updatedAt: null, previous: null, replanTask: null, status: 'idle', error: null }
+            : { ...s, region },
+      ),
+    [],
+  )
 
   const reset = useCallback(() => {
     abort.current?.abort()
